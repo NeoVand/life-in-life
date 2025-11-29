@@ -25,6 +25,13 @@
 	let lastMouseX = 0;
 	let lastMouseY = 0;
 
+	// Touch state
+	let touchMode: 'none' | 'draw' | 'pan' | 'pinch' = 'none';
+	let lastTouchX = 0;
+	let lastTouchY = 0;
+	let lastPinchDistance = 0;
+	let touchStartTime = 0;
+
 	// Animation
 	let animationId: number | null = null;
 	let lastStepTime = 0;
@@ -59,11 +66,22 @@
 		const resizeObserver = new ResizeObserver(handleResize);
 		resizeObserver.observe(container);
 
+		// Add touch event listeners with { passive: false } to allow preventDefault
+		canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+		canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+		canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+		canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+
 		return () => {
 			resizeObserver.disconnect();
 			if (animationId !== null) {
 				cancelAnimationFrame(animationId);
 			}
+			// Remove touch event listeners
+			canvas.removeEventListener('touchstart', handleTouchStart);
+			canvas.removeEventListener('touchmove', handleTouchMove);
+			canvas.removeEventListener('touchend', handleTouchEnd);
+			canvas.removeEventListener('touchcancel', handleTouchEnd);
 			simulation?.destroy();
 		};
 	});
@@ -278,6 +296,139 @@
 
 	function handleContextMenu(e: MouseEvent) {
 		e.preventDefault();
+	}
+
+	// Touch event handlers
+	function getTouchDistance(touches: TouchList): number {
+		if (touches.length < 2) return 0;
+		const dx = touches[0].clientX - touches[1].clientX;
+		const dy = touches[0].clientY - touches[1].clientY;
+		return Math.sqrt(dx * dx + dy * dy);
+	}
+
+	function getTouchCenter(touches: TouchList): { x: number; y: number } {
+		if (touches.length < 2) {
+			return { x: touches[0].clientX, y: touches[0].clientY };
+		}
+		return {
+			x: (touches[0].clientX + touches[1].clientX) / 2,
+			y: (touches[0].clientY + touches[1].clientY) / 2
+		};
+	}
+
+	function handleTouchStart(e: TouchEvent) {
+		if (!simulation) return;
+		e.preventDefault();
+
+		const touches = e.touches;
+		touchStartTime = performance.now();
+
+		if (touches.length === 1) {
+			// Single touch - start drawing
+			touchMode = 'draw';
+			const touch = touches[0];
+			const rect = canvas.getBoundingClientRect();
+			const x = (touch.clientX - rect.left) * (canvasWidth / rect.width);
+			const y = (touch.clientY - rect.top) * (canvasHeight / rect.height);
+			
+			lastTouchX = touch.clientX;
+			lastTouchY = touch.clientY;
+
+			const gridPos = simulation.screenToGrid(x, y, canvasWidth, canvasHeight);
+			gridMouseX = gridPos.x;
+			gridMouseY = gridPos.y;
+			simulation.paintBrush(gridPos.x, gridPos.y, simState.brushSize, simState.brushState);
+		} else if (touches.length === 2) {
+			// Two fingers - start pinch/pan
+			touchMode = 'pinch';
+			lastPinchDistance = getTouchDistance(touches);
+			const center = getTouchCenter(touches);
+			lastTouchX = center.x;
+			lastTouchY = center.y;
+		}
+	}
+
+	function handleTouchMove(e: TouchEvent) {
+		if (!simulation) return;
+		e.preventDefault();
+
+		const touches = e.touches;
+		const rect = canvas.getBoundingClientRect();
+
+		if (touches.length === 1 && touchMode === 'draw') {
+			// Single finger drawing
+			const touch = touches[0];
+			const x = (touch.clientX - rect.left) * (canvasWidth / rect.width);
+			const y = (touch.clientY - rect.top) * (canvasHeight / rect.height);
+
+			const gridPos = simulation.screenToGrid(x, y, canvasWidth, canvasHeight);
+			gridMouseX = gridPos.x;
+			gridMouseY = gridPos.y;
+			simulation.paintBrush(gridPos.x, gridPos.y, simState.brushSize, simState.brushState);
+			
+			lastTouchX = touch.clientX;
+			lastTouchY = touch.clientY;
+		} else if (touches.length === 2 && touchMode === 'pinch') {
+			// Two finger pinch zoom and pan
+			const currentDistance = getTouchDistance(touches);
+			const center = getTouchCenter(touches);
+
+			// Zoom
+			if (lastPinchDistance > 0) {
+				const zoomFactor = lastPinchDistance / currentDistance;
+				const screenX = (center.x - rect.left) * (canvasWidth / rect.width);
+				const screenY = (center.y - rect.top) * (canvasHeight / rect.height);
+				simulation.zoomAt(screenX, screenY, canvasWidth, canvasHeight, zoomFactor);
+			}
+
+			// Pan
+			const deltaX = center.x - lastTouchX;
+			const deltaY = center.y - lastTouchY;
+			simulation.pan(deltaX, deltaY, rect.width, rect.height);
+
+			lastPinchDistance = currentDistance;
+			lastTouchX = center.x;
+			lastTouchY = center.y;
+		} else if (touches.length === 1 && touchMode === 'pinch') {
+			// Went from 2 fingers to 1 - switch to pan mode
+			touchMode = 'pan';
+			const touch = touches[0];
+			lastTouchX = touch.clientX;
+			lastTouchY = touch.clientY;
+		} else if (touches.length === 1 && touchMode === 'pan') {
+			// Single finger panning (after pinch)
+			const touch = touches[0];
+			const deltaX = touch.clientX - lastTouchX;
+			const deltaY = touch.clientY - lastTouchY;
+			simulation.pan(deltaX, deltaY, rect.width, rect.height);
+			lastTouchX = touch.clientX;
+			lastTouchY = touch.clientY;
+		}
+	}
+
+	function handleTouchEnd(e: TouchEvent) {
+		if (!simulation) return;
+		e.preventDefault();
+
+		const touches = e.touches;
+
+		if (touches.length === 0) {
+			// All fingers lifted
+			if (touchMode === 'draw' && !simState.isPlaying) {
+				// After drawing while paused, update the count
+				simulation.countAliveCellsAsync().then(count => {
+					simState.aliveCells = count;
+				});
+			}
+			touchMode = 'none';
+			lastPinchDistance = 0;
+		} else if (touches.length === 1 && touchMode === 'pinch') {
+			// Went from 2 to 1 finger - continue as pan
+			touchMode = 'pan';
+			const touch = touches[0];
+			lastTouchX = touch.clientX;
+			lastTouchY = touch.clientY;
+		}
 	}
 
 	// Expose simulation methods
@@ -536,6 +687,10 @@
 		height: 100%;
 		display: block;
 		cursor: crosshair;
+		touch-action: none; /* Prevent default touch behaviors */
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		user-select: none;
 	}
 
 	canvas.pan-ready {

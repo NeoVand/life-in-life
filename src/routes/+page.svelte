@@ -33,6 +33,55 @@
 		return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, 0.3)`;
 	});
 
+	const accentColorBgHover = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, 0.25)`;
+	});
+
+	// Toolbar background derived from theme and accent color
+	const toolbarBg = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		if (simState.isLightTheme) {
+			return `rgba(${Math.round(r * 255 * 0.1 + 245)}, ${Math.round(g * 255 * 0.1 + 245)}, ${Math.round(b * 255 * 0.1 + 245)}, 0.7)`;
+		}
+		return `rgba(${Math.round(r * 255 * 0.05)}, ${Math.round(g * 255 * 0.05)}, ${Math.round(b * 255 * 0.05 + 8)}, 0.6)`;
+	});
+
+	const toolbarBorder = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		if (simState.isLightTheme) {
+			// Light theme: use the accent color with moderate opacity
+			return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, 0.2)`;
+		}
+		// Dark theme: use the accent color with lower opacity for subtle glow
+		return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, 0.15)`;
+	});
+
+	// Button backgrounds based on theme and accent
+	const btnBg = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		if (simState.isLightTheme) {
+			return `rgba(${Math.round(r * 255 * 0.1)}, ${Math.round(g * 255 * 0.1)}, ${Math.round(b * 255 * 0.1)}, 0.08)`;
+		}
+		return `rgba(${Math.round(r * 255 * 0.2 + 40)}, ${Math.round(g * 255 * 0.2 + 40)}, ${Math.round(b * 255 * 0.2 + 40)}, 0.15)`;
+	});
+
+	const btnBgHover = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		if (simState.isLightTheme) {
+			return `rgba(${Math.round(r * 255 * 0.15)}, ${Math.round(g * 255 * 0.15)}, ${Math.round(b * 255 * 0.15)}, 0.15)`;
+		}
+		return `rgba(${Math.round(r * 255 * 0.3 + 60)}, ${Math.round(g * 255 * 0.3 + 60)}, ${Math.round(b * 255 * 0.3 + 60)}, 0.25)`;
+	});
+
+	const btnBgActive = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		if (simState.isLightTheme) {
+			return `rgba(${Math.round(r * 255 * 0.2)}, ${Math.round(g * 255 * 0.2)}, ${Math.round(b * 255 * 0.2)}, 0.2)`;
+		}
+		return `rgba(${Math.round(r * 255 * 0.4 + 80)}, ${Math.round(g * 255 * 0.4 + 80)}, ${Math.round(b * 255 * 0.4 + 80)}, 0.3)`;
+	});
+
 	function handleClear() {
 		canvas.clear();
 	}
@@ -155,7 +204,7 @@
 <main 
 	class="app" 
 	class:light-theme={simState.isLightTheme}
-	style="--ui-accent: {accentColor}; --ui-accent-bg: {accentColorBg}; --ui-accent-border: {accentColorBorder};"
+	style="--ui-accent: {accentColor}; --ui-accent-bg: {accentColorBg}; --ui-accent-border: {accentColorBorder}; --ui-accent-bg-hover: {accentColorBgHover}; --toolbar-bg: {toolbarBg}; --toolbar-border: {toolbarBorder}; --btn-bg: {btnBg}; --btn-bg-hover: {btnBgHover}; --btn-bg-active: {btnBgActive};"
 >
 	<Canvas bind:this={canvas} />
 

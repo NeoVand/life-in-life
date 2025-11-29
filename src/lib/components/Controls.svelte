@@ -86,8 +86,6 @@
 			</svg>
 		</button>
 
-		<div class="sep"></div>
-
 		<!-- Speed -->
 		<div class="control-group">
 			<button
@@ -129,8 +127,6 @@
 			{/if}
 		</div>
 
-		<div class="sep"></div>
-
 		<!-- Clear -->
 		<button class="control-btn" onclick={onclear} data-tooltip="Clear (C)">
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -164,8 +160,6 @@
 				<path d="M8 6h8M6 8v8M18 8v8M8 18h8" stroke-dasharray="2 2" />
 			</svg>
 		</button>
-
-		<div class="sep"></div>
 
 		<!-- Screenshot -->
 		<button class="control-btn" onclick={onscreenshot} data-tooltip="Screenshot">
@@ -230,8 +224,6 @@
 			</svg>
 		</button>
 
-		<div class="sep"></div>
-
 		<!-- Collapse/Expand toggle -->
 		<button class="control-btn collapse-btn" onclick={() => (collapsed = !collapsed)} data-tooltip={collapsed ? "Expand" : "Collapse"}>
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -247,26 +239,25 @@
 		top: 1rem;
 		right: 1rem;
 		display: flex;
-		gap: 0.35rem;
+		gap: 0.2rem;
 		align-items: center;
-		background: rgba(12, 12, 18, 0.45);
-		backdrop-filter: blur(8px);
-		padding: 0.4rem;
+		background: var(--toolbar-bg, rgba(12, 12, 18, 0.5));
+		backdrop-filter: blur(12px);
+		padding: 0.3rem;
 		border-radius: 10px;
-		border: 1px solid rgba(255, 255, 255, 0.06);
+		border: 1px solid var(--toolbar-border, rgba(255, 255, 255, 0.08));
 		z-index: 100;
-		transition: gap 0.2s ease, padding 0.2s ease;
+		transition: gap 0.2s ease, padding 0.2s ease, background 0.2s ease;
 	}
 
 	.controls.collapsed {
-		padding: 0.3rem;
+		padding: 0.25rem;
 		gap: 0;
 	}
 
 	/* Hide all buttons except collapse when collapsed */
 	.controls.collapsed .control-btn:not(.collapse-btn),
-	.controls.collapsed .control-group,
-	.controls.collapsed .sep {
+	.controls.collapsed .control-group {
 		opacity: 0;
 		max-width: 0;
 		max-height: 0;
@@ -278,19 +269,18 @@
 
 	/* Animate buttons appearing/disappearing */
 	.control-btn:not(.collapse-btn),
-	.control-group,
-	.sep {
+	.control-group {
 		transition: opacity 0.2s ease, max-width 0.2s ease, max-height 0.2s ease;
 		max-width: 50px;
 		max-height: 50px;
 	}
 
 	.control-btn {
-		width: 34px;
-		height: 34px;
+		width: 32px;
+		height: 32px;
 		border: none;
 		outline: none;
-		background: transparent;
+		background: var(--btn-bg, rgba(255, 255, 255, 0.04));
 		color: var(--ui-text, #888);
 		cursor: pointer;
 		border-radius: 6px;
@@ -310,7 +300,7 @@
 	}
 
 	.control-btn:hover:not(:disabled) {
-		background: var(--ui-border, rgba(255, 255, 255, 0.08));
+		background: var(--btn-bg-hover, rgba(255, 255, 255, 0.1));
 		color: var(--ui-text-hover, #fff);
 	}
 
@@ -325,26 +315,28 @@
 	}
 
 	.control-btn.primary:hover {
-		background: var(--ui-accent-bg, rgba(45, 212, 191, 0.25));
-		filter: brightness(1.15);
+		background: var(--ui-accent-bg-hover, rgba(45, 212, 191, 0.25));
+		filter: brightness(1.1);
 	}
 
 	.control-btn.active {
-		background: var(--ui-border, rgba(255, 255, 255, 0.12));
+		background: var(--btn-bg-active, rgba(255, 255, 255, 0.12));
 		color: var(--ui-text-hover, #fff);
 	}
 
 	.control-btn svg {
-		width: 18px;
-		height: 18px;
+		width: 16px;
+		height: 16px;
 	}
 
 	.collapse-btn {
-		opacity: 0.5;
+		opacity: 0.6;
+		background: transparent;
 	}
 
 	.collapse-btn:hover {
 		opacity: 1;
+		background: var(--btn-bg-hover, rgba(255, 255, 255, 0.08));
 	}
 
 	.collapse-btn svg {
@@ -356,13 +348,6 @@
 		transform: rotate(180deg);
 	}
 
-	.sep {
-		width: 1px;
-		height: 20px;
-		background: var(--ui-border, rgba(255, 255, 255, 0.08));
-		margin: 0 0.15rem;
-	}
-
 	.control-group {
 		position: relative;
 	}
@@ -371,11 +356,11 @@
 		position: absolute;
 		top: calc(100% + 0.4rem);
 		right: 0;
-		background: rgba(12, 12, 18, 0.55);
-		backdrop-filter: blur(8px);
+		background: var(--toolbar-bg, rgba(12, 12, 18, 0.7));
+		backdrop-filter: blur(12px);
 		padding: 0.5rem 0.7rem;
 		border-radius: 6px;
-		border: 1px solid rgba(255, 255, 255, 0.06);
+		border: 1px solid var(--toolbar-border, rgba(255, 255, 255, 0.08));
 		min-width: 120px;
 		display: flex;
 		flex-direction: column;
@@ -477,11 +462,11 @@
 			bottom: 1rem;
 			right: 1rem;
 			flex-direction: column;
-			padding: 0.35rem;
+			padding: 0.25rem;
 		}
 
 		.controls.collapsed {
-			padding: 0.25rem;
+			padding: 0.2rem;
 		}
 
 		/* Collapse button at bottom - arrow points down (click to collapse) */
@@ -500,26 +485,19 @@
 
 		/* Mobile collapsed state - hide width/height for vertical layout */
 		.controls.collapsed .control-btn:not(.collapse-btn),
-		.controls.collapsed .control-group,
-		.controls.collapsed .sep {
+		.controls.collapsed .control-group {
 			width: 0;
 			height: 0;
 		}
 
-		.sep {
-			width: 20px;
-			height: 1px;
-			margin: 0.1rem 0;
-		}
-
 		.control-btn {
-			width: 40px;
-			height: 40px;
+			width: 36px;
+			height: 36px;
 		}
 
 		.control-btn svg {
-			width: 20px;
-			height: 20px;
+			width: 18px;
+			height: 18px;
 		}
 
 		/* Slider popups appear to the left on mobile */
