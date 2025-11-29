@@ -18,6 +18,10 @@
 	// Mouse state
 	let isDrawing = $state(false);
 	let isPanning = $state(false);
+	let isShiftHeld = $state(false);
+	let mouseInCanvas = $state(false);
+	let gridMouseX = $state(0);
+	let gridMouseY = $state(0);
 	let lastMouseX = 0;
 	let lastMouseY = 0;
 
@@ -100,15 +104,35 @@
 			}
 		}
 
-		// Sync view state
+		// Sync view state including brush preview
+		const showBrush = mouseInCanvas && !isShiftHeld && !isPanning;
 		simulation.setView({
 			showGrid: simState.showGrid,
 			isLightTheme: simState.isLightTheme,
-			aliveColor: simState.aliveColor
+			aliveColor: simState.aliveColor,
+			brushX: showBrush ? gridMouseX : -1000,
+			brushY: showBrush ? gridMouseY : -1000,
+			brushRadius: showBrush ? simState.brushSize : -1
 		});
 
 		// Always render
 		simulation.render(canvasWidth, canvasHeight);
+	}
+
+	// Keyboard handlers for shift key
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.key === 'Shift') {
+			isShiftHeld = true;
+		}
+	}
+
+	function handleKeyUp(e: KeyboardEvent) {
+		if (e.key === 'Shift') {
+			isShiftHeld = false;
+			if (!isPanning) {
+				// Reset cursor if not actively panning
+			}
+		}
 	}
 
 	// Mouse event handlers
@@ -145,6 +169,11 @@
 		const x = (e.clientX - rect.left) * (canvasWidth / rect.width);
 		const y = (e.clientY - rect.top) * (canvasHeight / rect.height);
 
+		// Update grid mouse position for brush preview
+		const gridPos = simulation.screenToGrid(x, y, canvasWidth, canvasHeight);
+		gridMouseX = gridPos.x;
+		gridMouseY = gridPos.y;
+
 		if (isPanning) {
 			const deltaX = e.clientX - lastMouseX;
 			const deltaY = e.clientY - lastMouseY;
@@ -156,12 +185,21 @@
 
 		if (isDrawing) {
 			const state = e.buttons === 1 ? simState.brushState : 0;
-			const gridPos = simulation.screenToGrid(x, y, canvasWidth, canvasHeight);
 			simulation.paintBrush(gridPos.x, gridPos.y, simState.brushSize, state);
 		}
 	}
 
 	function handleMouseUp() {
+		isDrawing = false;
+		isPanning = false;
+	}
+
+	function handleMouseEnter() {
+		mouseInCanvas = true;
+	}
+
+	function handleMouseLeave() {
+		mouseInCanvas = false;
 		isDrawing = false;
 		isPanning = false;
 	}
@@ -240,6 +278,8 @@
 	}
 </script>
 
+<svelte:window onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
+
 <div class="canvas-container" bind:this={container}>
 	{#if error}
 		<div class="error">
@@ -256,10 +296,13 @@
 		onmousedown={handleMouseDown}
 		onmousemove={handleMouseMove}
 		onmouseup={handleMouseUp}
-		onmouseleave={handleMouseUp}
+		onmouseenter={handleMouseEnter}
+		onmouseleave={handleMouseLeave}
 		onwheel={handleWheel}
 		oncontextmenu={handleContextMenu}
 		class:hidden={!!error}
+		class:panning={isPanning}
+		class:pan-ready={isShiftHeld && !isPanning}
 	></canvas>
 </div>
 
@@ -276,6 +319,14 @@
 		height: 100%;
 		display: block;
 		cursor: crosshair;
+	}
+
+	canvas.pan-ready {
+		cursor: grab;
+	}
+
+	canvas.panning {
+		cursor: grabbing;
 	}
 
 	canvas.hidden {
@@ -317,4 +368,3 @@
 		font-size: 0.9rem;
 	}
 </style>
-

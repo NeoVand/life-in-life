@@ -24,6 +24,9 @@ export interface ViewState {
 	showGrid: boolean;
 	isLightTheme: boolean;
 	aliveColor: [number, number, number]; // RGB 0-1
+	brushX: number;      // Brush center in grid coordinates
+	brushY: number;
+	brushRadius: number; // Brush radius in cells (-1 to hide)
 }
 
 export class Simulation {
@@ -77,7 +80,10 @@ export class Simulation {
 			zoom: Math.min(config.width, config.height),
 			showGrid: true,
 			isLightTheme: false,
-			aliveColor: [0.2, 0.9, 0.95] // Default cyan
+			aliveColor: [0.2, 0.9, 0.95], // Default cyan
+			brushX: -1000,
+			brushY: -1000,
+			brushRadius: -1 // Hidden by default
 		};
 
 		this.initializePipelines();
@@ -272,9 +278,9 @@ export class Simulation {
 			this.view.aliveColor[0],
 			this.view.aliveColor[1],
 			this.view.aliveColor[2],
-			0, // padding
-			0,
-			0
+			this.view.brushX,
+			this.view.brushY,
+			this.view.brushRadius
 		]);
 		this.device.queue.writeBuffer(this.renderParamsBuffer, 0, params);
 	}
@@ -494,7 +500,10 @@ export class Simulation {
 			zoom: Math.min(this.width, this.height),
 			showGrid: this.view.showGrid,
 			isLightTheme: this.view.isLightTheme,
-			aliveColor: this.view.aliveColor
+			aliveColor: this.view.aliveColor,
+			brushX: this.view.brushX,
+			brushY: this.view.brushY,
+			brushRadius: this.view.brushRadius
 		};
 	}
 

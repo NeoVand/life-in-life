@@ -20,9 +20,9 @@ struct RenderParams {
     alive_r: f32,        // Alive cell color (RGB)
     alive_g: f32,
     alive_b: f32,
-    _padding1: f32,
-    _padding2: f32,
-    _padding3: f32,
+    brush_x: f32,        // Brush center in grid coordinates
+    brush_y: f32,
+    brush_radius: f32,   // Brush radius in cells
 }
 
 @group(0) @binding(0) var<uniform> params: RenderParams;
@@ -185,6 +185,21 @@ fn state_to_color(state: u32, num_states: u32) -> vec3<f32> {
     return mix(dying_rgb, bg, bg_blend * 0.6);
 }
 
+// Check if a cell is within the brush radius
+fn is_in_brush(cell_x: i32, cell_y: i32) -> bool {
+    if (params.brush_radius < 0.0) {
+        return false; // Brush preview disabled
+    }
+    
+    // Calculate distance from cell center to brush center
+    let dx = f32(cell_x) + 0.5 - params.brush_x;
+    let dy = f32(cell_y) + 0.5 - params.brush_y;
+    let dist_sq = dx * dx + dy * dy;
+    let radius_sq = params.brush_radius * params.brush_radius;
+    
+    return dist_sq <= radius_sq;
+}
+
 @fragment
 fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
     // Calculate aspect ratio correction
@@ -207,6 +222,18 @@ fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
     
     // Base color from state
     var color = state_to_color(state, u32(params.num_states));
+    
+    // Brush preview highlight
+    if (is_in_brush(cell_x, cell_y)) {
+        // Highlight color based on theme
+        let highlight = select(
+            vec3<f32>(0.3, 0.9, 0.85), // Cyan highlight for dark theme
+            vec3<f32>(0.1, 0.6, 0.55), // Teal highlight for light theme
+            params.is_light_theme > 0.5
+        );
+        // Semi-transparent overlay
+        color = mix(color, highlight, 0.35);
+    }
     
     // Add grid lines when enabled and zoomed in enough to see them
     if (params.show_grid > 0.5) {
