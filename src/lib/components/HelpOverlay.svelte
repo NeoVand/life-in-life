@@ -38,12 +38,17 @@
 					</section>
 
 					<section class="shortcut-group">
+						<h3>Grid</h3>
+						<div class="shortcut"><kbd>I</kbd><span>Initialize (modal)</span></div>
+						<div class="shortcut"><kbd>R</kbd><span>Reinitialize</span></div>
+						<div class="shortcut"><kbd>C</kbd><span>Clear grid</span></div>
+					</section>
+
+					<section class="shortcut-group">
 						<h3>Drawing</h3>
 						<div class="shortcut"><kbd>Click</kbd><span>Draw cells</span></div>
 						<div class="shortcut"><kbd>Right-click</kbd><span>Erase cells</span></div>
 						<div class="shortcut"><kbd>[</kbd> <kbd>]</kbd><span>Brush size -/+</span></div>
-						<div class="shortcut"><kbd>C</kbd><span>Clear grid</span></div>
-						<div class="shortcut"><kbd>R</kbd><span>Randomize</span></div>
 					</section>
 				</div>
 
@@ -53,15 +58,15 @@
 						<h3>Navigation</h3>
 						<div class="shortcut"><kbd>Scroll</kbd><span>Zoom in/out</span></div>
 						<div class="shortcut"><kbd>Shift</kbd>+<kbd>Drag</kbd><span>Pan</span></div>
-						<div class="shortcut"><kbd>Home</kbd><span>Reset view</span></div>
-						<div class="shortcut"><kbd>G</kbd><span>Toggle grid</span></div>
+						<div class="shortcut"><kbd>H</kbd><span>Reset view</span></div>
+						<div class="shortcut"><kbd>G</kbd><span>Toggle grid lines</span></div>
 					</section>
 
 					<section class="shortcut-group">
 						<h3>Dialogs</h3>
 						<div class="shortcut"><kbd>E</kbd><span>Edit rules</span></div>
-						<div class="shortcut"><kbd>?</kbd><span>This help</span></div>
-						<div class="shortcut"><kbd>Esc</kbd><span>Close</span></div>
+						<div class="shortcut"><kbd>?</kbd><span>Help</span></div>
+						<div class="shortcut"><kbd>Esc</kbd><span>Close dialog</span></div>
 					</section>
 				</div>
 			</div>

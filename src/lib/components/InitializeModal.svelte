@@ -285,14 +285,16 @@
 			const cy = Math.floor(PREVIEW_SIZE / 2);
 
 			if (canTile && tilingEnabled) {
-				// Tile the pattern in preview - use minSpacing as the preview spacing
-				// This shows a representative tiled view regardless of actual spacing
-				// The actual spacing only affects the main canvas
-				const previewSpacing = minSpacing;
-				const startOffset = Math.floor(previewSpacing / 2);
+				// Show tiling at 1:1 scale - the preview shows a PREVIEW_SIZE x PREVIEW_SIZE
+				// section of the grid with the actual spacing
+				// This gives an accurate representation of how the tiles will look
+				const spacing = tilingSpacing;
+				const startOffset = Math.floor(spacing / 2) % spacing;
 				
-				for (let ty = startOffset; ty < PREVIEW_SIZE; ty += previewSpacing) {
-					for (let tx = startOffset; tx < PREVIEW_SIZE; tx += previewSpacing) {
+				// Place tiles at the actual spacing intervals
+				for (let ty = startOffset; ty < PREVIEW_SIZE; ty += spacing) {
+					for (let tx = startOffset; tx < PREVIEW_SIZE; tx += spacing) {
+						// Draw the actual pattern at this tile position
 						for (const [dx, dy] of cells) {
 							const x = tx + dx;
 							const y = ty + dy;

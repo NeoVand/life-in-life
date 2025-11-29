@@ -39,9 +39,20 @@
 		canvas.initialize(type, options);
 	}
 
-	function handleRandomize() {
-		// Quick randomize - still available via keyboard
-		canvas.randomize();
+	function handleReinitialize() {
+		// Reinitialize using the last initialization settings
+		const pattern = simState.lastInitPattern;
+		const tiled = simState.lastInitTiling;
+		const spacing = simState.lastInitSpacing;
+		
+		// Determine density from pattern name if it's a random pattern
+		let density = 0.15;
+		if (pattern === 'random-sparse') density = 0.08;
+		else if (pattern === 'random-medium') density = 0.15;
+		else if (pattern === 'random-dense') density = 0.25;
+		else if (pattern.startsWith('random-')) density = 0.3; // custom
+		
+		canvas.initialize(pattern, { density, tiled, spacing });
 	}
 
 	function handleStep() {
@@ -82,7 +93,7 @@
 				break;
 			case 'KeyR':
 				if (!e.ctrlKey && !e.metaKey) {
-					handleRandomize();
+					handleReinitialize();
 				}
 				break;
 			case 'KeyS':
@@ -96,16 +107,21 @@
 			case 'KeyE':
 				uiState.showRuleEditor = !uiState.showRuleEditor;
 				break;
+			case 'KeyI':
+				// Toggle initialize modal
+				showInitialize = !showInitialize;
+				break;
+			case 'KeyH':
 			case 'Home':
 				handleResetView();
 				break;
 			case 'Escape':
 				showHelp = false;
+				showInitialize = false;
 				uiState.closeAll();
 				break;
-			case 'F1':
 			case 'Slash':
-				if (e.shiftKey || e.code === 'F1') {
+				if (e.shiftKey) {
 					e.preventDefault();
 					showHelp = !showHelp;
 				}
