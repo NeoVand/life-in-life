@@ -12,6 +12,22 @@
 	let showHelp = $state(false);
 	let canvas: Canvas;
 
+	// Convert alive color (0-1 RGB) to CSS color strings
+	const accentColor = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+	});
+
+	const accentColorBg = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, 0.15)`;
+	});
+
+	const accentColorBorder = $derived.by(() => {
+		const [r, g, b] = simState.aliveColor;
+		return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, 0.3)`;
+	});
+
 	function handleClear() {
 		canvas.clear();
 	}
@@ -109,22 +125,12 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<main class="app" class:light-theme={simState.isLightTheme}>
+<main 
+	class="app" 
+	class:light-theme={simState.isLightTheme}
+	style="--ui-accent: {accentColor}; --ui-accent-bg: {accentColorBg}; --ui-accent-border: {accentColorBorder};"
+>
 	<Canvas bind:this={canvas} />
-
-	<!-- Help Button (top-left) -->
-	<button
-		class="help-button"
-		onclick={() => (showHelp = !showHelp)}
-		title="Help (? or F1)"
-		class:active={showHelp}
-	>
-		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-			<circle cx="12" cy="12" r="10" />
-			<path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
-			<circle cx="12" cy="17" r="0.5" fill="currentColor" />
-		</svg>
-	</button>
 
 	<Controls
 		onclear={handleClear}
@@ -132,6 +138,8 @@
 		onstep={handleStep}
 		onresetview={handleResetView}
 		onscreenshot={handleScreenshot}
+		onhelp={() => (showHelp = !showHelp)}
+		{showHelp}
 	/>
 
 	{#if showHelp}
@@ -164,9 +172,7 @@
 		--ui-border-hover: rgba(255, 255, 255, 0.15);
 		--ui-text: #888;
 		--ui-text-hover: #fff;
-		--ui-accent: #2dd4bf;
-		--ui-accent-bg: rgba(45, 212, 191, 0.15);
-		--ui-accent-border: rgba(45, 212, 191, 0.25);
+		/* --ui-accent, --ui-accent-bg, --ui-accent-border are set via inline style */
 	}
 
 	.app.light-theme {
@@ -176,45 +182,6 @@
 		--ui-border-hover: rgba(0, 0, 0, 0.2);
 		--ui-text: #555;
 		--ui-text-hover: #1a1a1a;
-		--ui-accent: #0891b2;
-		--ui-accent-bg: rgba(8, 145, 178, 0.15);
-		--ui-accent-border: rgba(8, 145, 178, 0.3);
-	}
-
-	.help-button {
-		position: fixed;
-		top: 1rem;
-		left: 1rem;
-		width: 34px;
-		height: 34px;
-		border: none;
-		background: var(--ui-bg);
-		backdrop-filter: blur(12px);
-		border: 1px solid var(--ui-border);
-		border-radius: 8px;
-		color: var(--ui-text);
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.15s;
-		z-index: 100;
-	}
-
-	.help-button:hover {
-		background: var(--ui-bg-hover);
-		color: var(--ui-text-hover);
-		border-color: var(--ui-border-hover);
-	}
-
-	.help-button.active {
-		background: var(--ui-accent-bg);
-		color: var(--ui-accent);
-		border-color: var(--ui-accent-border);
-	}
-
-	.help-button svg {
-		width: 18px;
-		height: 18px;
+		/* accent colors come from inline style based on selected color */
 	}
 </style>

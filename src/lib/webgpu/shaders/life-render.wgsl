@@ -185,15 +185,32 @@ fn state_to_color(state: u32, num_states: u32) -> vec3<f32> {
     return mix(dying_rgb, bg, bg_blend * 0.6);
 }
 
-// Check if a cell is within the brush radius
+// Check if a cell is within the brush radius (matches paintBrush logic exactly)
 fn is_in_brush(cell_x: i32, cell_y: i32) -> bool {
     if (params.brush_radius < 0.0) {
         return false; // Brush preview disabled
     }
     
-    // Calculate distance from cell center to brush center
-    let dx = f32(cell_x) + 0.5 - params.brush_x;
-    let dy = f32(cell_y) + 0.5 - params.brush_y;
+    // Match the exact logic from paintBrush:
+    // const r = Math.floor(radius);
+    // for (let dy = -r; dy <= r; dy++) {
+    //   for (let dx = -r; dx <= r; dx++) {
+    //     if (dx * dx + dy * dy <= radius * radius) {
+    //       this.setCell(Math.floor(centerX) + dx, Math.floor(centerY) + dy, state);
+    
+    let brush_center_x = floor(params.brush_x);
+    let brush_center_y = floor(params.brush_y);
+    
+    let dx = f32(cell_x) - brush_center_x;
+    let dy = f32(cell_y) - brush_center_y;
+    
+    let r = floor(params.brush_radius);
+    
+    // Check if within the iteration range AND within the circular brush
+    if (abs(dx) > r || abs(dy) > r) {
+        return false;
+    }
+    
     let dist_sq = dx * dx + dy * dy;
     let radius_sq = params.brush_radius * params.brush_radius;
     
@@ -223,16 +240,17 @@ fn fragment_main(input: VertexOutput) -> @location(0) vec4<f32> {
     // Base color from state
     var color = state_to_color(state, u32(params.num_states));
     
-    // Brush preview highlight
+    // Brush preview highlight - subtle semi-transparent overlay
     if (is_in_brush(cell_x, cell_y)) {
-        // Highlight color based on theme
-        let highlight = select(
-            vec3<f32>(0.3, 0.9, 0.85), // Cyan highlight for dark theme
-            vec3<f32>(0.1, 0.6, 0.55), // Teal highlight for light theme
-            params.is_light_theme > 0.5
-        );
-        // Semi-transparent overlay
-        color = mix(color, highlight, 0.35);
+        // Use a subtle white/black overlay based on theme
+        // This creates a "selected" look without being too distracting
+        if (params.is_light_theme > 0.5) {
+            // Light theme: darken with semi-transparent black overlay
+            color = mix(color, vec3<f32>(0.0, 0.0, 0.0), 0.2);
+        } else {
+            // Dark theme: lighten with semi-transparent white overlay  
+            color = mix(color, vec3<f32>(1.0, 1.0, 1.0), 0.2);
+        }
     }
     
     // Add grid lines when enabled and zoomed in enough to see them
