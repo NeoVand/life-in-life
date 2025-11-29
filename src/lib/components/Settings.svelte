@@ -55,10 +55,14 @@
 	}
 
 	function setTheme(isLight: boolean) {
+		// Get current color index before switching
+		const currentIndex = getSelectedColorIndex();
+		const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+		
 		simState.isLightTheme = isLight;
-		// Auto-select first color of the new theme for best visibility
+		// Keep the same index in the new palette
 		const newPalette = isLight ? lightThemeColors : darkThemeColors;
-		simState.aliveColor = newPalette[0].color;
+		simState.aliveColor = newPalette[safeIndex].color;
 	}
 
 	function requestGridSize(w: number, h: number) {

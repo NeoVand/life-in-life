@@ -23,6 +23,12 @@ let gridHeight = $state(1024);
 let isLightTheme = $state(false);
 let aliveColor = $state<[number, number, number]>([0.2, 0.9, 0.95]); // Cyan default
 
+// Last initialization settings
+let lastInitPattern = $state('random-medium');
+let lastInitCategory = $state('random');
+let lastInitTiling = $state(true);
+let lastInitSpacing = $state(50); // Actual cell spacing on main grid
+
 export function getSimulationState() {
 	return {
 		get isPlaying() {
@@ -100,6 +106,34 @@ export function getSimulationState() {
 		},
 		set aliveColor(value: [number, number, number]) {
 			aliveColor = value;
+		},
+
+		get lastInitPattern() {
+			return lastInitPattern;
+		},
+		set lastInitPattern(value: string) {
+			lastInitPattern = value;
+		},
+
+		get lastInitCategory() {
+			return lastInitCategory;
+		},
+		set lastInitCategory(value: string) {
+			lastInitCategory = value;
+		},
+
+		get lastInitTiling() {
+			return lastInitTiling;
+		},
+		set lastInitTiling(value: boolean) {
+			lastInitTiling = value;
+		},
+
+		get lastInitSpacing() {
+			return lastInitSpacing;
+		},
+		set lastInitSpacing(value: number) {
+			lastInitSpacing = value;
 		},
 
 		// Actions

@@ -5,6 +5,7 @@
 	import HelpOverlay from '$lib/components/HelpOverlay.svelte';
 	import Settings from '$lib/components/Settings.svelte';
 	import InitializeModal from '$lib/components/InitializeModal.svelte';
+	import InfoOverlay from '$lib/components/InfoOverlay.svelte';
 	import { getSimulationState, getUIState } from '$lib/stores/simulation.svelte.js';
 
 	const simState = getSimulationState();
@@ -34,8 +35,8 @@
 		canvas.clear();
 	}
 
-	function handleInitialize(type: string, density?: number) {
-		canvas.initialize(type, density);
+	function handleInitialize(type: string, options?: { density?: number; tiled?: boolean; spacing?: number }) {
+		canvas.initialize(type, options);
 	}
 
 	function handleRandomize() {
@@ -139,6 +140,8 @@
 >
 	<Canvas bind:this={canvas} />
 
+	<InfoOverlay />
+
 	<Controls
 		onclear={handleClear}
 		oninitialize={() => (showInitialize = true)}
@@ -188,6 +191,7 @@
 		--ui-text-hover: #fff;
 		--ui-input-bg: rgba(0, 0, 0, 0.3);
 		--ui-canvas-bg: #0a0a0f;
+		--ui-apply-text: #0a0a0f;
 		/* --ui-accent, --ui-accent-bg, --ui-accent-border are set via inline style */
 	}
 
@@ -200,6 +204,7 @@
 		--ui-text-hover: #1a1a1a;
 		--ui-input-bg: rgba(255, 255, 255, 0.5);
 		--ui-canvas-bg: #f0f0f3;
+		--ui-apply-text: #ffffff;
 		/* accent colors come from inline style based on selected color */
 	}
 </style>

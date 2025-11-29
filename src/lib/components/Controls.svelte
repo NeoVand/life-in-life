@@ -210,15 +210,6 @@
 	{/if}
 </div>
 
-<!-- Generation Counter -->
-<div class="generation">
-	Gen: {simState.generation.toLocaleString()}
-</div>
-
-<!-- Current Rule -->
-<div class="rule-display">
-	{simState.currentRule.name} ({simState.currentRule.ruleString})
-</div>
 
 <style>
 	.controls {
@@ -228,11 +219,11 @@
 		display: flex;
 		gap: 0.35rem;
 		align-items: center;
-		background: var(--ui-bg, rgba(12, 12, 18, 0.7));
-		backdrop-filter: blur(12px);
+		background: rgba(12, 12, 18, 0.45);
+		backdrop-filter: blur(8px);
 		padding: 0.4rem;
 		border-radius: 10px;
-		border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.08));
+		border: 1px solid rgba(255, 255, 255, 0.06);
 		z-index: 100;
 	}
 
@@ -307,11 +298,11 @@
 		position: absolute;
 		top: calc(100% + 0.4rem);
 		right: 0;
-		background: var(--ui-bg, rgba(12, 12, 18, 0.9));
-		backdrop-filter: blur(12px);
+		background: rgba(12, 12, 18, 0.55);
+		backdrop-filter: blur(8px);
 		padding: 0.5rem 0.7rem;
 		border-radius: 6px;
-		border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.08));
+		border: 1px solid rgba(255, 255, 255, 0.06);
 		min-width: 120px;
 		display: flex;
 		flex-direction: column;
@@ -329,32 +320,4 @@
 		accent-color: var(--ui-accent, #2dd4bf);
 	}
 
-	.generation {
-		position: fixed;
-		bottom: 1rem;
-		left: 1rem;
-		background: var(--ui-bg, rgba(12, 12, 18, 0.7));
-		backdrop-filter: blur(12px);
-		padding: 0.4rem 0.6rem;
-		border-radius: 6px;
-		border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.08));
-		font-size: 0.75rem;
-		color: var(--ui-text, #888);
-		font-family: 'SF Mono', Monaco, Consolas, monospace;
-		z-index: 100;
-	}
-
-	.rule-display {
-		position: fixed;
-		bottom: 1rem;
-		right: 1rem;
-		background: var(--ui-bg, rgba(12, 12, 18, 0.7));
-		backdrop-filter: blur(12px);
-		padding: 0.4rem 0.6rem;
-		border-radius: 6px;
-		border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.08));
-		font-size: 0.75rem;
-		color: var(--ui-text, #888);
-		z-index: 100;
-	}
 </style>

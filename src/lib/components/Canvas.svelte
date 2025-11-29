@@ -232,7 +232,7 @@
 		simState.resetGeneration();
 	}
 
-	export function initialize(type: string, density?: number) {
+	export function initialize(type: string, options?: { density?: number; tiled?: boolean; spacing?: number }) {
 		if (!simulation) return;
 		
 		// Clear first
@@ -241,81 +241,85 @@
 		
 		// Handle random types
 		if (type.startsWith('random')) {
-			const d = density ?? 0.15;
+			const d = options?.density ?? 0.15;
 			simulation.randomize(d);
 			return;
 		}
 
-		// Get grid center
-		const cx = Math.floor(simState.gridWidth / 2);
-		const cy = Math.floor(simState.gridHeight / 2);
-
 		// Define patterns (relative to center)
 		const patterns: Record<string, [number, number][]> = {
-			// Glider
+			// Conway's Life patterns
 			'glider': [[0, -1], [1, 0], [-1, 1], [0, 1], [1, 1]],
-			
-			// R-pentomino (methuselah)
+			'lwss': [[-2, -1], [-2, 1], [-1, -2], [0, -2], [1, -2], [2, -2], [2, -1], [2, 0], [1, 1]],
 			'r-pentomino': [[0, -1], [1, -1], [-1, 0], [0, 0], [0, 1]],
-			
-			// Acorn
 			'acorn': [[-3, 0], [-2, 0], [-2, -2], [0, -1], [1, 0], [2, 0], [3, 0]],
-			
-			// Diehard
 			'diehard': [[-3, 0], [-2, 0], [-2, 1], [2, 1], [3, -1], [3, 1], [4, 1]],
-			
-			// Blinker (oscillator)
 			'blinker': [[-1, 0], [0, 0], [1, 0]],
-			
-			// Block (still life)
+			'toad': [[-1, 0], [0, 0], [1, 0], [0, 1], [1, 1], [2, 1]],
+			'beacon': [[-1, -1], [0, -1], [-1, 0], [1, 1], [2, 0], [2, 1]],
 			'block': [[0, 0], [1, 0], [0, 1], [1, 1]],
-			
-			// Beehive (still life)
 			'beehive': [[-1, 0], [0, -1], [1, -1], [2, 0], [1, 1], [0, 1]],
-			
-			// Loaf (still life)
 			'loaf': [[0, -1], [1, -1], [-1, 0], [2, 0], [0, 1], [2, 1], [1, 2]],
-			
-			// Pulsar (period 3 oscillator)
-			'pulsar': (() => {
-				const cells: [number, number][] = [];
-				const offsets = [
-					[-6, -4], [-6, -3], [-6, -2], [-4, -6], [-3, -6], [-2, -6],
-					[-6, 2], [-6, 3], [-6, 4], [-4, 6], [-3, 6], [-2, 6],
-					[6, -4], [6, -3], [6, -2], [4, -6], [3, -6], [2, -6],
-					[6, 2], [6, 3], [6, 4], [4, 6], [3, 6], [2, 6],
-					[-1, -4], [-1, -3], [-1, -2], [1, -4], [1, -3], [1, -2],
-					[-1, 2], [-1, 3], [-1, 4], [1, 2], [1, 3], [1, 4],
-					[-4, -1], [-3, -1], [-2, -1], [-4, 1], [-3, 1], [-2, 1],
-					[4, -1], [3, -1], [2, -1], [4, 1], [3, 1], [2, 1]
-				];
-				return offsets as [number, number][];
-			})(),
-			
-			// Pentadecathlon (period 15)
+			'boat': [[0, 0], [1, 0], [0, 1], [2, 1], [1, 2]],
+			'pulsar': [
+				[-6, -4], [-6, -3], [-6, -2], [-4, -6], [-3, -6], [-2, -6],
+				[-6, 2], [-6, 3], [-6, 4], [-4, 6], [-3, 6], [-2, 6],
+				[6, -4], [6, -3], [6, -2], [4, -6], [3, -6], [2, -6],
+				[6, 2], [6, 3], [6, 4], [4, 6], [3, 6], [2, 6],
+				[-1, -4], [-1, -3], [-1, -2], [1, -4], [1, -3], [1, -2],
+				[-1, 2], [-1, 3], [-1, 4], [1, 2], [1, 3], [1, 4],
+				[-4, -1], [-3, -1], [-2, -1], [-4, 1], [-3, 1], [-2, 1],
+				[4, -1], [3, -1], [2, -1], [4, 1], [3, 1], [2, 1]
+			],
 			'pentadecathlon': [
 				[-4, 0], [-3, -1], [-3, 1], [-2, 0], [-1, 0], [0, 0], [1, 0],
 				[2, 0], [3, -1], [3, 1], [4, 0]
 			],
-			
-			// Gosper glider gun
 			'glider-gun': [
-				// Left block
 				[-18, 0], [-18, 1], [-17, 0], [-17, 1],
-				// Left part
 				[-8, 0], [-8, 1], [-8, 2], [-7, -1], [-7, 3], [-6, -2], [-6, 4],
 				[-5, -2], [-5, 4], [-4, 1], [-3, -1], [-3, 3], [-2, 0], [-2, 1], [-2, 2],
 				[-1, 1],
-				// Right part
 				[2, -2], [2, -1], [2, 0], [3, -2], [3, -1], [3, 0], [4, -3], [4, 1],
 				[6, -4], [6, -3], [6, 1], [6, 2],
-				// Right block
 				[16, -2], [16, -1], [17, -2], [17, -1]
-			]
+			],
+			// HighLife patterns
+			'replicator': [[0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1]],
+			// Day & Night patterns
+			'dn-glider': [[0, 0], [1, 0], [2, 0], [0, 1], [2, 1], [1, 2]],
+			'dn-blinker': [[-1, 0], [0, 0], [1, 0]],
+			'dn-ship': [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]],
+			// Brian's Brain patterns
+			'bb-glider': [[0, 0], [1, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2]]
 		};
 
 		const pattern = patterns[type];
-		if (pattern) {
+		if (!pattern) return;
+
+		const gridW = simState.gridWidth;
+		const gridH = simState.gridHeight;
+
+		if (options?.tiled && options.spacing) {
+			// Tile the pattern across the grid
+			// spacing is the actual cell distance on the grid
+			const spacing = options.spacing;
+			
+			for (let ty = Math.floor(spacing / 2); ty < gridH; ty += spacing) {
+				for (let tx = Math.floor(spacing / 2); tx < gridW; tx += spacing) {
+					for (const [dx, dy] of pattern) {
+						const x = tx + dx;
+						const y = ty + dy;
+						if (x >= 0 && x < gridW && y >= 0 && y < gridH) {
+							simulation.setCell(x, y, 1);
+						}
+					}
+				}
+			}
+		} else {
+			// Single pattern in center
+			const cx = Math.floor(gridW / 2);
+			const cy = Math.floor(gridH / 2);
 			for (const [dx, dy] of pattern) {
 				simulation.setCell(cx + dx, cy + dy, 1);
 			}

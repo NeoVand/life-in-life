@@ -616,7 +616,7 @@
 	.btn.apply {
 		background: var(--ui-accent, #2dd4bf);
 		border: none;
-		color: #0a0a0f;
+		color: var(--ui-apply-text, #0a0a0f);
 	}
 
 	.btn.apply:hover { filter: brightness(1.15); }
