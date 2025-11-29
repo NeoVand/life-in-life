@@ -112,17 +112,49 @@
 			<button
 				class="control-btn"
 				onclick={toggleBrush}
-				data-tooltip="Brush Size"
+				data-tooltip="Brush"
 				class:active={showBrushSlider}
 			>
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<circle cx="12" cy="12" r={Math.min(8, simState.brushSize)} />
+					{#if simState.brushState === 1}
+						<!-- Filled circle for draw mode -->
+						<circle cx="12" cy="12" r={Math.min(8, simState.brushSize)} fill="currentColor" />
+					{:else}
+						<!-- Empty circle with X for erase mode -->
+						<circle cx="12" cy="12" r={Math.min(8, simState.brushSize)} />
+						<path d="M9 9l6 6M15 9l-6 6" stroke-width="1.5" />
+					{/if}
 				</svg>
 			</button>
 			{#if showBrushSlider}
-				<div class="slider-popup">
-					<span>{simState.brushSize}px</span>
-					<input type="range" min="1" max="50" bind:value={simState.brushSize} />
+				<div class="slider-popup brush-popup">
+					<div class="mode-toggle">
+						<button 
+							class="mode-btn" 
+							class:active={simState.brushState === 1}
+							onclick={() => simState.brushState = 1}
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor">
+								<circle cx="12" cy="12" r="6" />
+							</svg>
+							<span>Draw</span>
+						</button>
+						<button 
+							class="mode-btn" 
+							class:active={simState.brushState === 0}
+							onclick={() => simState.brushState = 0}
+						>
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<circle cx="12" cy="12" r="6" />
+								<path d="M9 9l6 6M15 9l-6 6" stroke-width="1.5" />
+							</svg>
+							<span>Erase</span>
+						</button>
+					</div>
+					<div class="size-control">
+						<span>{simState.brushSize}px</span>
+						<input type="range" min="1" max="50" bind:value={simState.brushSize} />
+					</div>
 				</div>
 			{/if}
 		</div>
@@ -376,6 +408,62 @@
 	.slider-popup input[type='range'] {
 		width: 100%;
 		accent-color: var(--ui-accent, #2dd4bf);
+	}
+
+	/* Brush popup with mode toggle */
+	.brush-popup {
+		min-width: 140px;
+		gap: 0.5rem;
+	}
+
+	.mode-toggle {
+		display: flex;
+		gap: 0.25rem;
+		background: var(--ui-input-bg, rgba(0, 0, 0, 0.3));
+		border-radius: 5px;
+		padding: 0.2rem;
+	}
+
+	.mode-btn {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.3rem;
+		padding: 0.35rem 0.5rem;
+		border: none;
+		background: transparent;
+		color: var(--ui-text, #888);
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 0.65rem;
+		transition: all 0.15s;
+	}
+
+	.mode-btn svg {
+		width: 12px;
+		height: 12px;
+	}
+
+	.mode-btn:hover {
+		color: var(--ui-text-hover, #fff);
+	}
+
+	.mode-btn.active {
+		background: var(--ui-accent-bg, rgba(45, 212, 191, 0.2));
+		color: var(--ui-accent, #2dd4bf);
+	}
+
+	.size-control {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+
+	.size-control span {
+		font-size: 0.65rem;
+		color: var(--ui-text, #888);
+		text-align: center;
 	}
 
 	/* Custom tooltips that appear below */

@@ -180,10 +180,10 @@ export function getRuleByName(name: string): CARule | undefined {
 }
 
 /**
- * Get the default rule (Conway's Life)
+ * Get the default rule (Star Wars)
  */
 export function getDefaultRule(): CARule {
-	return RULE_PRESETS[0];
+	return getRuleByName('Star Wars') || RULE_PRESETS[0];
 }
 
 /**

@@ -5,6 +5,10 @@
 
 	let { onclose }: Props = $props();
 
+	// Detect if we're on a touch device
+	const isMobile = typeof window !== 'undefined' && 
+		('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
 	function handleBackdropClick(e: MouseEvent) {
 		if (e.target === e.currentTarget) {
 			onclose();
@@ -18,7 +22,7 @@
 <div class="help-overlay" role="dialog" aria-modal="true" onclick={handleBackdropClick}>
 	<div class="help-panel">
 		<div class="help-header">
-			<h2>Keyboard Shortcuts</h2>
+			<h2>{isMobile ? 'Touch Controls' : 'Keyboard Shortcuts'}</h2>
 			<button class="close-btn" onclick={onclose} aria-label="Close">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<path d="M18 6L6 18M6 6l12 12" />
@@ -27,49 +31,90 @@
 		</div>
 
 		<div class="help-content">
-			<div class="columns">
-				<!-- Left Column -->
-				<div class="column">
-					<section class="shortcut-group">
-						<h3>Simulation</h3>
-						<div class="shortcut"><kbd>Space</kbd><span>Play / Pause</span></div>
-						<div class="shortcut"><kbd>S</kbd><span>Step one generation</span></div>
-						<div class="shortcut"><kbd>,</kbd> <kbd>.</kbd><span>Speed -/+</span></div>
-					</section>
-
-					<section class="shortcut-group">
-						<h3>Grid</h3>
-						<div class="shortcut"><kbd>I</kbd><span>Initialize (modal)</span></div>
-						<div class="shortcut"><kbd>R</kbd><span>Reinitialize</span></div>
-						<div class="shortcut"><kbd>C</kbd><span>Clear grid</span></div>
-					</section>
-
+			{#if isMobile}
+				<!-- Mobile Touch Controls -->
+				<div class="touch-controls">
 					<section class="shortcut-group">
 						<h3>Drawing</h3>
-						<div class="shortcut"><kbd>Click</kbd><span>Draw cells</span></div>
-						<div class="shortcut"><kbd>Right-click</kbd><span>Erase cells</span></div>
-						<div class="shortcut"><kbd>[</kbd> <kbd>]</kbd><span>Brush size -/+</span></div>
+						<div class="shortcut">
+							<span class="gesture">👆 Tap / Drag</span>
+							<span>Draw or erase cells</span>
+						</div>
+						<div class="shortcut">
+							<span class="gesture">🖌️ Brush menu</span>
+							<span>Toggle draw/erase mode</span>
+						</div>
 					</section>
-				</div>
 
-				<!-- Right Column -->
-				<div class="column">
 					<section class="shortcut-group">
 						<h3>Navigation</h3>
-						<div class="shortcut"><kbd>Scroll</kbd><span>Zoom in/out</span></div>
-						<div class="shortcut"><kbd>Shift</kbd>+<kbd>Drag</kbd><span>Pan</span></div>
-						<div class="shortcut"><kbd>H</kbd><span>Reset view</span></div>
-						<div class="shortcut"><kbd>G</kbd><span>Toggle grid lines</span></div>
+						<div class="shortcut">
+							<span class="gesture">🤏 Pinch</span>
+							<span>Zoom in/out</span>
+						</div>
+						<div class="shortcut">
+							<span class="gesture">✌️ Two-finger drag</span>
+							<span>Pan around</span>
+						</div>
+						<div class="shortcut">
+							<span class="gesture">🏠 Home button</span>
+							<span>Reset view</span>
+						</div>
 					</section>
 
 					<section class="shortcut-group">
-						<h3>Dialogs</h3>
-						<div class="shortcut"><kbd>E</kbd><span>Edit rules</span></div>
-						<div class="shortcut"><kbd>?</kbd><span>Help</span></div>
-						<div class="shortcut"><kbd>Esc</kbd><span>Close dialog</span></div>
+						<h3>Tips</h3>
+						<div class="tip">Use the toolbar buttons for all controls</div>
+						<div class="tip">Tap brush icon to switch draw/erase</div>
+						<div class="tip">Pinch with two fingers to zoom</div>
 					</section>
 				</div>
-			</div>
+			{:else}
+				<!-- Desktop Keyboard Shortcuts -->
+				<div class="columns">
+					<!-- Left Column -->
+					<div class="column">
+						<section class="shortcut-group">
+							<h3>Simulation</h3>
+							<div class="shortcut"><kbd>Space</kbd><span>Play / Pause</span></div>
+							<div class="shortcut"><kbd>S</kbd><span>Step one generation</span></div>
+							<div class="shortcut"><kbd>,</kbd> <kbd>.</kbd><span>Speed -/+</span></div>
+						</section>
+
+						<section class="shortcut-group">
+							<h3>Grid</h3>
+							<div class="shortcut"><kbd>I</kbd><span>Initialize (modal)</span></div>
+							<div class="shortcut"><kbd>R</kbd><span>Reinitialize</span></div>
+							<div class="shortcut"><kbd>C</kbd><span>Clear grid</span></div>
+						</section>
+
+						<section class="shortcut-group">
+							<h3>Drawing</h3>
+							<div class="shortcut"><kbd>Click</kbd><span>Draw cells</span></div>
+							<div class="shortcut"><kbd>Right-click</kbd><span>Erase cells</span></div>
+							<div class="shortcut"><kbd>[</kbd> <kbd>]</kbd><span>Brush size -/+</span></div>
+						</section>
+					</div>
+
+					<!-- Right Column -->
+					<div class="column">
+						<section class="shortcut-group">
+							<h3>Navigation</h3>
+							<div class="shortcut"><kbd>Scroll</kbd><span>Zoom in/out</span></div>
+							<div class="shortcut"><kbd>Shift</kbd>+<kbd>Drag</kbd><span>Pan</span></div>
+							<div class="shortcut"><kbd>H</kbd><span>Reset view</span></div>
+							<div class="shortcut"><kbd>G</kbd><span>Toggle grid lines</span></div>
+						</section>
+
+						<section class="shortcut-group">
+							<h3>Dialogs</h3>
+							<div class="shortcut"><kbd>E</kbd><span>Edit rules</span></div>
+							<div class="shortcut"><kbd>?</kbd><span>Help</span></div>
+							<div class="shortcut"><kbd>Esc</kbd><span>Close dialog</span></div>
+						</section>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -181,10 +226,46 @@
 		text-align: center;
 	}
 
-	/* Hide on mobile - keyboard shortcuts aren't useful on touch devices */
+	/* Touch controls styling */
+	.touch-controls {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.touch-controls .shortcut {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.15rem;
+	}
+
+	.touch-controls .shortcut span {
+		margin-left: 0;
+	}
+
+	.gesture {
+		font-size: 0.75rem;
+		color: var(--ui-text-hover, #e0e0e0);
+	}
+
+	.tip {
+		font-size: 0.65rem;
+		color: var(--ui-text, #888);
+		padding: 0.25rem 0;
+		border-left: 2px solid var(--ui-accent, #2dd4bf);
+		padding-left: 0.5rem;
+		margin-bottom: 0.25rem;
+	}
+
+	/* Mobile adjustments */
 	@media (max-width: 768px) {
-		.help-overlay {
-			display: none;
+		.help-panel {
+			width: 90vw;
+			max-width: 320px;
+		}
+
+		.help-header h2 {
+			font-size: 0.85rem;
 		}
 	}
 </style>
