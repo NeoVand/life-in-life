@@ -4,12 +4,14 @@
 	import RuleEditor from '$lib/components/RuleEditor.svelte';
 	import HelpOverlay from '$lib/components/HelpOverlay.svelte';
 	import Settings from '$lib/components/Settings.svelte';
+	import InitializeModal from '$lib/components/InitializeModal.svelte';
 	import { getSimulationState, getUIState } from '$lib/stores/simulation.svelte.js';
 
 	const simState = getSimulationState();
 	const uiState = getUIState();
 	
 	let showHelp = $state(false);
+	let showInitialize = $state(false);
 	let canvas: Canvas;
 
 	// Convert alive color (0-1 RGB) to CSS color strings
@@ -32,7 +34,12 @@
 		canvas.clear();
 	}
 
+	function handleInitialize(type: string, density?: number) {
+		canvas.initialize(type, density);
+	}
+
 	function handleRandomize() {
+		// Quick randomize - still available via keyboard
 		canvas.randomize();
 	}
 
@@ -134,7 +141,7 @@
 
 	<Controls
 		onclear={handleClear}
-		onrandomize={handleRandomize}
+		oninitialize={() => (showInitialize = true)}
 		onstep={handleStep}
 		onresetview={handleResetView}
 		onscreenshot={handleScreenshot}
@@ -144,6 +151,13 @@
 
 	{#if showHelp}
 		<HelpOverlay onclose={() => (showHelp = false)} />
+	{/if}
+
+	{#if showInitialize}
+		<InitializeModal
+			onclose={() => (showInitialize = false)}
+			oninitialize={handleInitialize}
+		/>
 	{/if}
 
 	{#if uiState.showRuleEditor}
@@ -172,6 +186,8 @@
 		--ui-border-hover: rgba(255, 255, 255, 0.15);
 		--ui-text: #888;
 		--ui-text-hover: #fff;
+		--ui-input-bg: rgba(0, 0, 0, 0.3);
+		--ui-canvas-bg: #0a0a0f;
 		/* --ui-accent, --ui-accent-bg, --ui-accent-border are set via inline style */
 	}
 
@@ -182,6 +198,8 @@
 		--ui-border-hover: rgba(0, 0, 0, 0.2);
 		--ui-text: #555;
 		--ui-text-hover: #1a1a1a;
+		--ui-input-bg: rgba(255, 255, 255, 0.5);
+		--ui-canvas-bg: #f0f0f3;
 		/* accent colors come from inline style based on selected color */
 	}
 </style>

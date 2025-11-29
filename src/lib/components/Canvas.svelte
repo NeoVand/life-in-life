@@ -227,9 +227,99 @@
 		simState.resetGeneration();
 	}
 
-	export function randomize() {
-		simulation?.randomize(0.15);
+	export function randomize(density: number = 0.15) {
+		simulation?.randomize(density);
 		simState.resetGeneration();
+	}
+
+	export function initialize(type: string, density?: number) {
+		if (!simulation) return;
+		
+		// Clear first
+		simulation.clear();
+		simState.resetGeneration();
+		
+		// Handle random types
+		if (type.startsWith('random')) {
+			const d = density ?? 0.15;
+			simulation.randomize(d);
+			return;
+		}
+
+		// Get grid center
+		const cx = Math.floor(simState.gridWidth / 2);
+		const cy = Math.floor(simState.gridHeight / 2);
+
+		// Define patterns (relative to center)
+		const patterns: Record<string, [number, number][]> = {
+			// Glider
+			'glider': [[0, -1], [1, 0], [-1, 1], [0, 1], [1, 1]],
+			
+			// R-pentomino (methuselah)
+			'r-pentomino': [[0, -1], [1, -1], [-1, 0], [0, 0], [0, 1]],
+			
+			// Acorn
+			'acorn': [[-3, 0], [-2, 0], [-2, -2], [0, -1], [1, 0], [2, 0], [3, 0]],
+			
+			// Diehard
+			'diehard': [[-3, 0], [-2, 0], [-2, 1], [2, 1], [3, -1], [3, 1], [4, 1]],
+			
+			// Blinker (oscillator)
+			'blinker': [[-1, 0], [0, 0], [1, 0]],
+			
+			// Block (still life)
+			'block': [[0, 0], [1, 0], [0, 1], [1, 1]],
+			
+			// Beehive (still life)
+			'beehive': [[-1, 0], [0, -1], [1, -1], [2, 0], [1, 1], [0, 1]],
+			
+			// Loaf (still life)
+			'loaf': [[0, -1], [1, -1], [-1, 0], [2, 0], [0, 1], [2, 1], [1, 2]],
+			
+			// Pulsar (period 3 oscillator)
+			'pulsar': (() => {
+				const cells: [number, number][] = [];
+				const offsets = [
+					[-6, -4], [-6, -3], [-6, -2], [-4, -6], [-3, -6], [-2, -6],
+					[-6, 2], [-6, 3], [-6, 4], [-4, 6], [-3, 6], [-2, 6],
+					[6, -4], [6, -3], [6, -2], [4, -6], [3, -6], [2, -6],
+					[6, 2], [6, 3], [6, 4], [4, 6], [3, 6], [2, 6],
+					[-1, -4], [-1, -3], [-1, -2], [1, -4], [1, -3], [1, -2],
+					[-1, 2], [-1, 3], [-1, 4], [1, 2], [1, 3], [1, 4],
+					[-4, -1], [-3, -1], [-2, -1], [-4, 1], [-3, 1], [-2, 1],
+					[4, -1], [3, -1], [2, -1], [4, 1], [3, 1], [2, 1]
+				];
+				return offsets as [number, number][];
+			})(),
+			
+			// Pentadecathlon (period 15)
+			'pentadecathlon': [
+				[-4, 0], [-3, -1], [-3, 1], [-2, 0], [-1, 0], [0, 0], [1, 0],
+				[2, 0], [3, -1], [3, 1], [4, 0]
+			],
+			
+			// Gosper glider gun
+			'glider-gun': [
+				// Left block
+				[-18, 0], [-18, 1], [-17, 0], [-17, 1],
+				// Left part
+				[-8, 0], [-8, 1], [-8, 2], [-7, -1], [-7, 3], [-6, -2], [-6, 4],
+				[-5, -2], [-5, 4], [-4, 1], [-3, -1], [-3, 3], [-2, 0], [-2, 1], [-2, 2],
+				[-1, 1],
+				// Right part
+				[2, -2], [2, -1], [2, 0], [3, -2], [3, -1], [3, 0], [4, -3], [4, 1],
+				[6, -4], [6, -3], [6, 1], [6, 2],
+				// Right block
+				[16, -2], [16, -1], [17, -2], [17, -1]
+			]
+		};
+
+		const pattern = patterns[type];
+		if (pattern) {
+			for (const [dx, dy] of pattern) {
+				simulation.setCell(cx + dx, cy + dy, 1);
+			}
+		}
 	}
 
 	export function stepOnce() {

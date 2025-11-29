@@ -103,7 +103,8 @@
 	function renderPreview() {
 		if (!previewCtx) return;
 		const cellSize = previewCanvas.width / PREVIEW_SIZE;
-		previewCtx.fillStyle = '#0a0a0f';
+		// Use theme-aware background
+		previewCtx.fillStyle = simState.isLightTheme ? '#f0f0f3' : '#0a0a0f';
 		previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
 
 		for (let y = 0; y < PREVIEW_SIZE; y++) {
@@ -352,7 +353,7 @@
 		align-items: center;
 		gap: 0.4rem;
 		padding: 0.35rem 0.6rem;
-		background: rgba(0, 0, 0, 0.3);
+		background: var(--ui-input-bg, rgba(0, 0, 0, 0.3));
 		border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.1));
 		border-radius: 5px;
 		color: var(--ui-text-hover, #ccc);
@@ -509,7 +510,7 @@
 
 	.canvas {
 		border-radius: 5px;
-		background: #0a0a0f;
+		background: var(--ui-canvas-bg, #0a0a0f);
 	}
 
 	.preview-btns {
@@ -579,7 +580,7 @@
 	.rule-input input {
 		width: 80px;
 		padding: 0.3rem 0.5rem;
-		background: rgba(0, 0, 0, 0.3);
+		background: var(--ui-input-bg, rgba(0, 0, 0, 0.3));
 		border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.1));
 		border-radius: 4px;
 		color: var(--ui-accent, #2dd4bf);
