@@ -6,6 +6,7 @@
 	import Settings from '$lib/components/Settings.svelte';
 	import InitializeModal from '$lib/components/InitializeModal.svelte';
 	import InfoOverlay from '$lib/components/InfoOverlay.svelte';
+	import AboutModal from '$lib/components/AboutModal.svelte';
 	import { getSimulationState, getUIState, type GridScale } from '$lib/stores/simulation.svelte.js';
 
 	const simState = getSimulationState();
@@ -13,6 +14,7 @@
 	
 	let showHelp = $state(false);
 	let showInitialize = $state(false);
+	let showAbout = $state(false);
 	let canvas: Canvas;
 
 	// Convert alive color (0-1 RGB) to CSS color strings
@@ -118,6 +120,7 @@
 			case 'Escape':
 				showHelp = false;
 				showInitialize = false;
+				showAbout = false;
 				uiState.closeAll();
 				break;
 			case 'Slash':
@@ -165,6 +168,7 @@
 		onresetview={handleResetView}
 		onscreenshot={handleScreenshot}
 		onhelp={() => (showHelp = !showHelp)}
+		onabout={() => (showAbout = !showAbout)}
 		{showHelp}
 	/>
 
@@ -191,6 +195,10 @@
 			onclose={() => (uiState.showSettings = false)}
 			onscalechange={handleScaleChange}
 		/>
+	{/if}
+
+	{#if showAbout}
+		<AboutModal onclose={() => (showAbout = false)} />
 	{/if}
 </main>
 

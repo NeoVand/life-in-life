@@ -1,38 +1,108 @@
-# sv
+# Games of Life
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A WebGPU-powered cellular automaton simulator. Runs entirely on the GPU for smooth performance even on large grids.
 
-## Creating a project
+**[Live Demo →](https://neovand.github.io/games-of-life/)**
 
-If you're seeing this, you've probably already done this step. Congrats!
+![Svelte](https://img.shields.io/badge/Svelte-5-ff3e00?style=flat&logo=svelte)
+![WebGPU](https://img.shields.io/badge/WebGPU-Compute-blue?style=flat)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat)
 
-```sh
-# create a new project in the current directory
-npx sv create
+## How It Works
 
-# create a new project in my-app
-npx sv create my-app
+The simulation runs as a compute shader on the GPU. Each frame, the shader reads the current grid state, applies the cellular automaton rules in parallel across all cells, and writes to a second buffer. The buffers swap each frame (double buffering).
+
+```mermaid
+flowchart LR
+    subgraph GPU
+        A[Cell Buffer A] -->|read| C[Compute Shader]
+        C -->|write| B[Cell Buffer B]
+        B -->|next frame| C
+        C -->|read| A
+    end
+    
+    subgraph CPU
+        R[Rule Config] -->|uniforms| C
+        P[Paint Commands] -->|merge| C
+    end
+    
+    B --> D[Render Shader]
+    A --> D
+    D --> E[Canvas]
 ```
 
-## Developing
+### Rule Encoding
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Rules are encoded as bitmasks for fast GPU lookup:
 
-```sh
+```
+B3/S23 (Conway's Life)
+├── Birth mask:   0b000001000  (bit 3 set → birth with 3 neighbors)
+└── Survive mask: 0b000001100  (bits 2,3 set → survive with 2 or 3)
+```
+
+The compute shader checks neighbors and uses bitwise AND to determine the next state—no branching required.
+
+### Multi-State Support
+
+Beyond binary Life-like rules, the simulator supports Generations rules (e.g., Brian's Brain). Cells transition through N states before dying, creating trail effects:
+
+```
+State 0 (dead) ← State N-1 ← ... ← State 2 ← State 1 (alive)
+                    ↑__________________________|
+                         (only if birth condition met)
+```
+
+## Tech Stack
+
+- **WebGPU** — Compute shaders for simulation, render shaders for visualization
+- **Svelte 5** — Reactive UI with runes (`$state`, `$derived`, `$effect`)
+- **SvelteKit** — Static site generation via `adapter-static`
+- **TypeScript** — Type-safe GPU buffer management
+- **WGSL** — WebGPU Shading Language for both compute and fragment shaders
+
+## Project Structure
+
+```
+src/lib/
+├── webgpu/
+│   ├── context.ts        # Device initialization, capability detection
+│   ├── simulation.ts     # Compute pipeline, double buffering, painting
+│   └── shaders/
+│       ├── life-compute.wgsl   # CA rules, neighbor counting
+│       └── life-render.wgsl    # Zoom/pan, grid lines, coloring
+├── components/
+│   ├── Canvas.svelte     # WebGPU canvas, mouse/keyboard handling
+│   ├── Controls.svelte   # Toolbar with play/pause, speed, brush
+│   ├── RuleEditor.svelte # Birth/survive checkboxes, presets
+│   └── ...
+└── stores/
+    └── simulation.svelte.ts  # Reactive state management
+```
+
+## Running Locally
+
+```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+Requires a browser with WebGPU support (Chrome 113+, Edge 113+, or Firefox Nightly with flags).
 
-To create a production version of your app:
+## Controls
 
-```sh
-npm run build
-```
+| Key | Action |
+|-----|--------|
+| `Space` | Play/Pause |
+| `Click` / `Right-click` | Draw / Erase |
+| `Scroll` | Zoom |
+| `Shift+Drag` | Pan |
+| `E` | Edit rules |
+| `I` | Initialize grid |
+| `R` | Reinitialize |
+| `[ ]` | Brush size |
+| `, .` | Speed |
 
-You can preview the production build with `npm run preview`.
+## License
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+MIT
