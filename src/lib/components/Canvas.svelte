@@ -728,14 +728,14 @@
 
 	/* Rotate canvas 90 degrees when device orientation changes from initial */
 	canvas.rotated {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		/* After 90deg rotation, width displays as height and vice versa */
-		/* So we set width to viewport height and height to viewport width */
-		width: 100vh !important;
-		height: 100vw !important;
-		transform: translate(-50%, -50%) rotate(90deg);
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		right: 0 !important;
+		bottom: 0 !important;
+		width: 100dvh !important;
+		height: 100dvw !important;
+		transform: translate(calc(50dvw - 50dvh), calc(50dvh - 50dvw)) rotate(90deg);
 	}
 
 	canvas.pan-ready {

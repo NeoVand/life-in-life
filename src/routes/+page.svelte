@@ -253,8 +253,8 @@
 
 <style>
 	.app {
-		width: 100%;
-		height: 100vh;
+		position: fixed;
+		inset: 0;
 		overflow: hidden;
 		--ui-bg: rgba(12, 12, 18, 0.7);
 		--ui-bg-hover: rgba(20, 20, 30, 0.8);
