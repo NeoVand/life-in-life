@@ -36,6 +36,11 @@
 	let animationId: number | null = null;
 	let lastStepTime = 0;
 
+	// Track initial orientation to detect rotation
+	let initialOrientation: 'portrait' | 'landscape' | null = null;
+	let isRotated = $state(false);
+
+
 	/**
 	 * Calculate grid dimensions from scale and screen aspect ratio
 	 * The baseCells value represents the shorter dimension
@@ -66,6 +71,22 @@
 		const resizeObserver = new ResizeObserver(handleResize);
 		resizeObserver.observe(container);
 
+		// Handle orientation change on mobile - just rotate the canvas
+		function handleOrientationChange() {
+			if (!initialOrientation) return;
+			
+			const screenWidth = window.innerWidth;
+			const screenHeight = window.innerHeight;
+			const currentOrientation = screenWidth >= screenHeight ? 'landscape' : 'portrait';
+			
+			// Check if orientation flipped from initial
+			isRotated = currentOrientation !== initialOrientation;
+		}
+		
+		window.addEventListener('orientationchange', handleOrientationChange);
+		// Also listen to resize event as a fallback
+		window.addEventListener('resize', handleOrientationChange);
+
 		// Add touch event listeners with { passive: false } to allow preventDefault
 		canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
 		canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -74,6 +95,8 @@
 
 		return () => {
 			resizeObserver.disconnect();
+			window.removeEventListener('orientationchange', handleOrientationChange);
+			window.removeEventListener('resize', handleOrientationChange);
 			if (animationId !== null) {
 				cancelAnimationFrame(animationId);
 			}
@@ -99,6 +122,10 @@
 		// Calculate initial grid size based on screen dimensions and scale
 		const screenWidth = window.innerWidth;
 		const screenHeight = window.innerHeight;
+		
+		// Remember initial orientation
+		initialOrientation = screenWidth >= screenHeight ? 'landscape' : 'portrait';
+		
 		const { width, height } = calculateGridDimensions(simState.gridScale, screenWidth, screenHeight);
 		simState.gridWidth = width;
 		simState.gridHeight = height;
@@ -171,8 +198,10 @@
 			wrapBoundary: simState.wrapBoundary
 		});
 
-		// Always render
-		simulation.render(canvasWidth, canvasHeight);
+		// Always render - swap dimensions if canvas is rotated
+		const renderWidth = isRotated ? canvasHeight : canvasWidth;
+		const renderHeight = isRotated ? canvasWidth : canvasHeight;
+		simulation.render(renderWidth, renderHeight);
 
 		// Update alive cells count (sync version for display)
 		simState.aliveCells = simulation.countAliveCells();
@@ -671,6 +700,7 @@
 		class:hidden={!!error}
 		class:panning={isPanning}
 		class:pan-ready={isShiftHeld && !isPanning}
+		class:rotated={isRotated}
 	></canvas>
 </div>
 
@@ -691,6 +721,16 @@
 		-webkit-touch-callout: none;
 		-webkit-user-select: none;
 		user-select: none;
+	}
+
+	/* Rotate canvas 90 degrees when device orientation changes from initial */
+	canvas.rotated {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 100vh;
+		height: 100vw;
+		transform: translate(-50%, -50%) rotate(90deg);
 	}
 
 	canvas.pan-ready {
