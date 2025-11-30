@@ -611,33 +611,24 @@
 					}}>
 						<!-- Search bar -->
 						<div class="search-bar" class:active={ruleSearchMode || ruleSearchQuery}>
-							{#if isMobile && !ruleSearchMode}
-								<button class="search-toggle" onclick={() => { ruleSearchMode = true; setTimeout(() => ruleSearchInput?.focus(), 50); }}>
+							<svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<circle cx="11" cy="11" r="8" />
+								<path d="M21 21l-4.35-4.35" />
+							</svg>
+							<input 
+								bind:this={ruleSearchInput}
+								type="text" 
+								class="search-input" 
+								placeholder="Search rules..."
+								bind:value={ruleSearchQuery}
+								onfocus={() => ruleSearchMode = true}
+							/>
+							{#if ruleSearchQuery}
+								<button class="search-clear" onclick={() => { ruleSearchQuery = ''; ruleSearchInput?.focus(); }}>
 									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-										<circle cx="11" cy="11" r="8" />
-										<path d="M21 21l-4.35-4.35" />
+										<path d="M18 6L6 18M6 6l12 12" />
 									</svg>
 								</button>
-							{:else}
-								<svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-									<circle cx="11" cy="11" r="8" />
-									<path d="M21 21l-4.35-4.35" />
-								</svg>
-								<input 
-									bind:this={ruleSearchInput}
-									type="text" 
-									class="search-input" 
-									placeholder="Search rules..."
-									bind:value={ruleSearchQuery}
-									onfocus={() => ruleSearchMode = true}
-								/>
-								{#if ruleSearchQuery}
-									<button class="search-clear" onclick={() => { ruleSearchQuery = ''; ruleSearchInput?.focus(); }}>
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-											<path d="M18 6L6 18M6 6l12 12" />
-										</svg>
-									</button>
-								{/if}
 							{/if}
 						</div>
 						
@@ -951,30 +942,6 @@
 
 	.search-bar.active {
 		background: rgba(0, 0, 0, 0.3);
-	}
-
-	.search-toggle {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 28px;
-		height: 28px;
-		background: rgba(255, 255, 255, 0.08);
-		border: none;
-		border-radius: 4px;
-		color: var(--ui-text, #888);
-		cursor: pointer;
-		margin: 0 auto;
-	}
-
-	.search-toggle:hover {
-		background: rgba(255, 255, 255, 0.12);
-		color: var(--ui-accent, #2dd4bf);
-	}
-
-	.search-toggle svg {
-		width: 16px;
-		height: 16px;
 	}
 
 	.search-icon {
