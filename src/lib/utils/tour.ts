@@ -247,6 +247,15 @@ const icons = {
 	// Checkmark/done icon
 	check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tour-icon">
 		<path d="M20 6L9 17l-5-5"/>
+	</svg>`,
+	// Trash/clear icon
+	trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tour-icon">
+		<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+	</svg>`,
+	// Camera/screenshot icon
+	camera: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tour-icon">
+		<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z"/>
+		<circle cx="12" cy="13" r="4"/>
 	</svg>`
 };
 
@@ -266,12 +275,13 @@ function getWelcomeContent(): string {
 	`;
 }
 
-// Tour step definitions
+// Tour step definitions - buttons in order from left to right (desktop) or top to bottom (mobile)
 function getTourSteps(): DriveStep[] {
 	const mobile = isMobile();
+	const popoverSide = mobile ? 'left' : 'bottom';
 	
 	const steps: DriveStep[] = [
-		// Welcome step (no element)
+		// 1. Welcome step (no element)
 		{
 			popover: {
 				title: titleWithIcon(icons.heart, 'Welcome to Games of Life'),
@@ -280,7 +290,7 @@ function getTourSteps(): DriveStep[] {
 				align: 'center'
 			}
 		},
-		// Canvas interaction
+		// 2. Canvas interaction
 		{
 			element: 'canvas',
 			popover: {
@@ -292,83 +302,133 @@ function getTourSteps(): DriveStep[] {
 				align: 'center'
 			}
 		},
-		// Play/Pause
+		// 3. Play/Pause (first button)
 		{
 			element: '#tour-play-btn',
 			popover: {
 				title: titleWithIcon(icons.play, 'Play / Pause'),
 				description: 'Start or stop the simulation. Watch cells evolve according to the rules of life.',
-				side: mobile ? 'left' : 'bottom',
+				side: popoverSide,
 				align: 'center'
 			}
 		},
-		// Speed control
+		// 4. Step
+		{
+			element: '#tour-step-btn',
+			popover: {
+				title: titleWithIcon(icons.play, 'Step Forward'),
+				description: 'Advance the simulation by one generation. Great for studying patterns frame by frame.',
+				side: popoverSide,
+				align: 'center'
+			}
+		},
+		// 5. Speed control
 		{
 			element: '#tour-speed-btn',
 			popover: {
 				title: titleWithIcon(icons.clock, 'Speed Control'),
-				description: 'Adjust simulation speed. Click to open a slider for precise control.',
-				side: mobile ? 'left' : 'bottom',
+				description: 'Adjust how fast the simulation runs. Click to open a slider.',
+				side: popoverSide,
 				align: 'center'
 			}
 		},
-		// Brush tool
-		{
-			element: '#tour-brush-btn',
-			popover: {
-				title: titleWithIcon(icons.brush, 'Brush Tool'),
-				description: 'Change brush size and switch between draw and erase modes to create your own patterns.',
-				side: mobile ? 'left' : 'bottom',
-				align: 'center'
-			}
-		},
-		// Initialize
-		{
-			element: '#tour-init-btn',
-			popover: {
-				title: titleWithIcon(icons.refresh, 'Initialize Grid'),
-				description: 'Start fresh with preset patterns like gliders, oscillators, or random configurations.',
-				side: mobile ? 'left' : 'bottom',
-				align: 'center'
-			}
-		},
-		// Rules editor
+		// 6. Rules editor
 		{
 			element: '#tour-rules-btn',
 			popover: {
 				title: titleWithIcon(icons.rules, 'Rule Editor'),
-				description: 'Change the rules of life. Try presets like HighLife or Day & Night, or define your own.',
-				side: mobile ? 'left' : 'bottom',
+				description: 'Change the rules of life. Try presets like HighLife, Day & Night, or create your own.',
+				side: popoverSide,
 				align: 'center'
 			}
 		},
-		// Settings
+		// 7. Brush tool
 		{
-			element: '#tour-settings-btn',
+			element: '#tour-brush-btn',
 			popover: {
-				title: titleWithIcon(icons.settings, 'Settings'),
-				description: 'Customize colors, switch themes, adjust grid size, and configure boundary behavior.',
-				side: mobile ? 'left' : 'bottom',
+				title: titleWithIcon(icons.brush, 'Brush Tool'),
+				description: 'Adjust brush size and switch between draw and erase modes to create patterns.',
+				side: popoverSide,
 				align: 'center'
 			}
 		},
-		// Help button
+		// 8. Clear
+		{
+			element: '#tour-clear-btn',
+			popover: {
+				title: titleWithIcon(icons.trash, 'Clear Grid'),
+				description: 'Wipe the canvas clean and start fresh.',
+				side: popoverSide,
+				align: 'center'
+			}
+		},
+		// 9. Initialize
+		{
+			element: '#tour-init-btn',
+			popover: {
+				title: titleWithIcon(icons.refresh, 'Initialize'),
+				description: 'Load preset patterns like gliders, oscillators, or fill with random cells.',
+				side: popoverSide,
+				align: 'center'
+			}
+		},
+		// 10. Fit to screen
+		{
+			element: '#tour-fit-btn',
+			popover: {
+				title: titleWithIcon(icons.canvas, 'Fit to Screen'),
+				description: 'Reset the view to show the entire grid centered on screen.',
+				side: popoverSide,
+				align: 'center'
+			}
+		},
+		// 11. Screenshot
+		{
+			element: '#tour-screenshot-btn',
+			popover: {
+				title: titleWithIcon(icons.camera, 'Screenshot'),
+				description: 'Save the current canvas as an image file.',
+				side: popoverSide,
+				align: 'center'
+			}
+		},
+		// 12. Help button
 		{
 			element: '#tour-help-btn',
 			popover: {
 				title: titleWithIcon(icons.help, 'Help'),
 				description: mobile 
-					? 'View touch controls and tips. You can restart this tour from here anytime.'
-					: 'View keyboard shortcuts and tips. You can restart this tour from here anytime.',
-				side: mobile ? 'left' : 'bottom',
+					? 'View touch controls and tips. Restart this tour anytime from here.'
+					: 'View keyboard shortcuts and tips. Restart this tour anytime from here.',
+				side: popoverSide,
 				align: 'center'
 			}
 		},
-		// Final step
+		// 13. Settings
+		{
+			element: '#tour-settings-btn',
+			popover: {
+				title: titleWithIcon(icons.settings, 'Settings'),
+				description: 'Customize colors, switch themes, adjust grid size, and set boundary behavior.',
+				side: popoverSide,
+				align: 'center'
+			}
+		},
+		// 14. About
+		{
+			element: '#tour-about-btn',
+			popover: {
+				title: titleWithIcon(icons.heart, 'About'),
+				description: 'Learn more about Games of Life and access the GitHub repository.',
+				side: popoverSide,
+				align: 'center'
+			}
+		},
+		// 15. Final step
 		{
 			popover: {
-				title: titleWithIcon(icons.check, 'Ready to Explore'),
-				description: 'You\'re all set. Press Play to begin watching cells evolve.',
+				title: titleWithIcon(icons.check, 'Ready to Explore!'),
+				description: 'You\'re all set. Press Play to watch cells come alive!',
 				side: 'over',
 				align: 'center'
 			}
@@ -388,14 +448,17 @@ export function createTour(options?: {
 	const accentColor = options?.accentColor || getCSSVariable('--ui-accent');
 	const isLight = options?.isLightTheme ?? false;
 	
+	// Create driver instance first so we can reference it in callbacks
+	let driverObj: ReturnType<typeof driver>;
+	
 	const config: Config = {
 		showProgress: true,
 		animate: true,
 		smoothScroll: true,
 		allowClose: true,
 		overlayClickNext: false,
-		stagePadding: 8,
-		stageRadius: 8,
+		stagePadding: 2,
+		stageRadius: 6,
 		popoverClass: `gol-tour-popover ${isLight ? 'light-theme' : 'dark-theme'}`,
 		overlayColor: isLight ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.7)',
 		steps: getTourSteps(),
@@ -416,13 +479,16 @@ export function createTour(options?: {
 			options?.onComplete?.();
 		},
 		onCloseClick: () => {
+			// Close the tour when X is clicked
 			stopMiniSim();
 			markTourCompleted();
 			options?.onSkip?.();
+			driverObj.destroy();
 		}
 	};
 	
-	return driver(config);
+	driverObj = driver(config);
+	return driverObj;
 }
 
 // Start the tour

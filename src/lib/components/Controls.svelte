@@ -82,7 +82,7 @@
 		</button>
 
 		<!-- Step -->
-		<button class="control-btn" onclick={onstep} data-tooltip="Step (S)" disabled={simState.isPlaying}>
+		<button id="tour-step-btn" class="control-btn" onclick={onstep} data-tooltip="Step (S)" disabled={simState.isPlaying}>
 			<svg viewBox="0 0 24 24" fill="currentColor">
 				<path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2V6z" />
 			</svg>
@@ -181,7 +181,7 @@
 		</div>
 
 		<!-- Clear -->
-		<button class="control-btn" onclick={onclear} data-tooltip="Clear (C)">
+		<button id="tour-clear-btn" class="control-btn" onclick={onclear} data-tooltip="Clear (C)">
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 				<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 			</svg>
@@ -195,7 +195,7 @@
 		</button>
 
 		<!-- Reset View / Zoom to Fit -->
-		<button class="control-btn" onclick={onresetview} data-tooltip="Fit to Screen (H)">
+		<button id="tour-fit-btn" class="control-btn" onclick={onresetview} data-tooltip="Fit to Screen (H)">
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 				<!-- Zoom to fit / fullscreen corners -->
 				<path d="M4 14v4a2 2 0 002 2h4" />
@@ -211,7 +211,7 @@
 		</button>
 
 		<!-- Screenshot -->
-		<button class="control-btn" onclick={onscreenshot} data-tooltip="Screenshot">
+		<button id="tour-screenshot-btn" class="control-btn" onclick={onscreenshot} data-tooltip="Screenshot">
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 				<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" />
 				<circle cx="12" cy="13" r="4" />
@@ -241,7 +241,7 @@
 		</button>
 
 		<!-- About / Logo -->
-		<button class="control-btn logo-btn" onclick={onabout} data-tooltip="About">
+		<button id="tour-about-btn" class="control-btn logo-btn" onclick={onabout} data-tooltip="About">
 			<HeartIcon size={18} animated={true} />
 		</button>
 
