@@ -10,9 +10,6 @@
 
 	const simState = getSimulationState();
 
-	// Confirmation dialog state
-	let showConfirm = $state(false);
-	let pendingScale = $state<GridScale | null>(null);
 
 	// Different palettes for dark and light themes
 	const darkThemeColors: { name: string; color: [number, number, number]; hex: string }[] = [
@@ -58,7 +55,7 @@
 		simState.aliveColor = newPalette[safeIndex].color;
 	}
 
-	function requestScale(scale: GridScale) {
+	function changeScale(scale: GridScale) {
 		if (scale === simState.gridScale) return;
 		
 		// Pause if playing
@@ -66,43 +63,19 @@
 			simState.pause();
 		}
 		
-		pendingScale = scale;
-		showConfirm = true;
-	}
-
-	function confirmResize() {
-		if (pendingScale) {
-			onscalechange(pendingScale);
-		}
-		showConfirm = false;
-		pendingScale = null;
-	}
-
-	function cancelResize() {
-		showConfirm = false;
-		pendingScale = null;
+		// Apply immediately
+		onscalechange(scale);
 	}
 	
 	// Get current dimensions for display
 	const currentDimensions = $derived(`${simState.gridWidth}×${simState.gridHeight}`);
 </script>
 
-<svelte:window onkeydown={(e) => e.key === 'Escape' && (showConfirm ? cancelResize() : onclose())} />
+<svelte:window onkeydown={(e) => e.key === 'Escape' && onclose()} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="backdrop" onclick={(e) => e.target === e.currentTarget && onclose()}>
-	{#if showConfirm}
-		<!-- Confirmation Dialog -->
-		<div class="confirm-dialog">
-			<p>Changing grid scale will clear the simulation.</p>
-			<p class="sub">A new grid will be created to fit your screen.</p>
-			<div class="confirm-btns">
-				<button class="btn secondary" onclick={cancelResize}>Cancel</button>
-				<button class="btn primary" onclick={confirmResize}>Continue</button>
-			</div>
-		</div>
-	{:else}
-		<!-- Settings Panel -->
+	<!-- Settings Panel -->
 		<div class="panel">
 			<div class="header">
 				<span class="title">
@@ -217,7 +190,7 @@
 							<button
 								class="size"
 								class:selected={simState.gridScale === scale.name}
-								onclick={() => requestScale(scale.name)}
+								onclick={() => changeScale(scale.name)}
 							>
 								{scale.label}
 							</button>
@@ -226,7 +199,6 @@
 				</div>
 			</div>
 		</div>
-	{/if}
 </div>
 
 <style>
@@ -519,36 +491,6 @@
 		background: var(--ui-accent-bg, rgba(45, 212, 191, 0.15));
 		border-color: var(--ui-accent-border, rgba(45, 212, 191, 0.3));
 		color: var(--ui-accent, #2dd4bf);
-	}
-
-	/* Confirmation Dialog */
-	.confirm-dialog {
-		background: var(--ui-bg, rgba(12, 12, 18, 0.95));
-		backdrop-filter: blur(16px);
-		border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.1));
-		border-radius: 10px;
-		padding: 1rem;
-		max-width: 280px;
-		text-align: center;
-		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
-	}
-
-	.confirm-dialog p {
-		margin: 0 0 0.3rem;
-		font-size: 0.8rem;
-		color: var(--ui-text-hover, #e0e0e0);
-	}
-
-	.confirm-dialog .sub {
-		font-size: 0.7rem;
-		color: var(--ui-text, #666);
-		margin-bottom: 0.8rem;
-	}
-
-	.confirm-btns {
-		display: flex;
-		gap: 0.4rem;
-		justify-content: center;
 	}
 
 	.btn {
