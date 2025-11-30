@@ -645,7 +645,7 @@
 		// Load the transposed data
 		simulation.setCellData(newData);
 		
-		// Restore view settings (swap offsets too)
+		// Restore view settings
 		simulation.setView({
 			showGrid: currentView.showGrid,
 			isLightTheme: currentView.isLightTheme,
@@ -653,8 +653,12 @@
 			wrapBoundary: currentView.wrapBoundary
 		});
 		
-		// Reset view to fit new dimensions
-		simulation.resetView(canvasWidth, canvasHeight);
+		// Use current actual canvas dimensions for reset view
+		// The canvas dimensions should have been updated by the resize observer
+		const dpr = window.devicePixelRatio || 1;
+		const actualWidth = Math.floor(container.clientWidth * dpr);
+		const actualHeight = Math.floor(container.clientHeight * dpr);
+		simulation.resetView(actualWidth, actualHeight);
 	}
 
 	export function updateRule() {

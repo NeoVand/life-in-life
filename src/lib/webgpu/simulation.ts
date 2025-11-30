@@ -576,8 +576,9 @@ export class Simulation {
 		// Get grid position before zoom
 		const gridPos = this.screenToGrid(screenX, screenY, canvasWidth, canvasHeight);
 
-		// Apply zoom
-		const newZoom = Math.max(10, Math.min(this.width, this.view.zoom * factor));
+		// Apply zoom - allow zooming out to 2x the grid size for padding
+		const maxZoom = Math.max(this.width, this.height) * 2;
+		const newZoom = Math.max(10, Math.min(maxZoom, this.view.zoom * factor));
 
 		// Calculate new offset to keep gridPos at the same screen position
 		const aspect = canvasWidth / canvasHeight;
@@ -610,35 +611,44 @@ export class Simulation {
 	 * @param canvasHeight - Canvas height in pixels (optional, uses stored value if not provided)
 	 */
 	resetView(canvasWidth?: number, canvasHeight?: number): void {
-		// Calculate zoom to fit entire grid in view
+		// Calculate zoom to fit entire grid in view with some padding
 		// zoom represents cells visible across the screen width
 		// We need to ensure both dimensions fit
 		
 		let zoom: number;
+		let offsetX = 0;
+		let offsetY = 0;
+		
 		if (canvasWidth && canvasHeight) {
 			const canvasAspect = canvasWidth / canvasHeight;
 			const gridAspect = this.width / this.height;
 			
+			// Add 5% padding
+			const paddingFactor = 1.05;
+			
 			if (gridAspect >= canvasAspect) {
 				// Grid is wider than canvas - fit to width
-				zoom = this.width;
+				zoom = this.width * paddingFactor;
 			} else {
 				// Grid is taller than canvas - fit to height
-				// zoom = cells visible across width
-				// cells visible across height = zoom / canvasAspect
-				// We want cells visible across height = grid height
-				// So: zoom / canvasAspect = this.height
-				// zoom = this.height * canvasAspect
-				zoom = this.height * canvasAspect;
+				zoom = this.height * canvasAspect * paddingFactor;
 			}
+			
+			// Calculate cells visible in each dimension
+			const cellsVisibleX = zoom;
+			const cellsVisibleY = zoom / canvasAspect;
+			
+			// Center the grid: offset so grid is in the middle of visible area
+			offsetX = (this.width - cellsVisibleX) / 2;
+			offsetY = (this.height - cellsVisibleY) / 2;
 		} else {
 			// Fallback to minimum dimension (old behavior)
 			zoom = Math.min(this.width, this.height);
 		}
 		
 		this.view = {
-			offsetX: 0,
-			offsetY: 0,
+			offsetX,
+			offsetY,
 			zoom,
 			showGrid: this.view.showGrid,
 			isLightTheme: this.view.isLightTheme,
