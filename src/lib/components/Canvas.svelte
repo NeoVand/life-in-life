@@ -598,7 +598,10 @@
 	}
 
 	export function resetView() {
-		simulation?.resetView(canvasWidth, canvasHeight);
+		// Swap dimensions if canvas is rotated
+		const viewWidth = isRotated ? canvasHeight : canvasWidth;
+		const viewHeight = isRotated ? canvasWidth : canvasHeight;
+		simulation?.resetView(viewWidth, viewHeight);
 	}
 
 	export function updateRule() {

@@ -313,8 +313,8 @@
 		color: var(--ui-accent, #2dd4bf);
 	}
 
-	/* Hide on mobile */
-	@media (max-width: 768px) {
+	/* Hide on mobile - use both max-width and pointer check for touch devices */
+	@media (max-width: 768px), (pointer: coarse) {
 		.info-icon,
 		.info-panel {
 			display: none;
