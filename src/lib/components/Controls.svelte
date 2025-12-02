@@ -284,7 +284,7 @@
 		background: var(--toolbar-bg, rgba(12, 12, 18, 0.5));
 		backdrop-filter: blur(12px);
 		padding: 0.35rem;
-		border-radius: 10px;
+		border-radius: 9999px;
 		border: 1px solid var(--toolbar-border, rgba(255, 255, 255, 0.08));
 		z-index: 100;
 		transition: gap 0.2s ease, padding 0.2s ease, background 0.2s ease;
@@ -302,7 +302,7 @@
 		align-items: center;
 		background: var(--group-bg, rgba(255, 255, 255, 0.04));
 		padding: 0.2rem 0.35rem;
-		border-radius: 8px;
+		border-radius: 9999px;
 		border: 1px solid var(--group-border, rgba(255, 255, 255, 0.06));
 		transition: background 0.15s, border-color 0.15s;
 	}
