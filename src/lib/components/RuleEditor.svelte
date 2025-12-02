@@ -1123,7 +1123,7 @@
 						title={mode.description}
 						aria-label={mode.name}
 					>
-						<BoundaryIcon mode={mode.id} size={22} />
+						<BoundaryIcon mode={mode.id} size={32} />
 					</button>
 				{/each}
 			</div>
@@ -1958,8 +1958,8 @@
 	}
 	
 	.boundary-btn {
-		width: 32px;
-		height: 32px;
+		width: 42px;
+		height: 42px;
 		padding: 0;
 		background: var(--ui-input-bg, rgba(0, 0, 0, 0.3));
 		border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.1));

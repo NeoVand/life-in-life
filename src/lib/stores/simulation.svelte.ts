@@ -33,14 +33,14 @@ function isMobileDevice(): boolean {
 }
 
 // Grid configuration - now calculated from scale
-// Default to 'small' on mobile, 'medium' on desktop
-let gridScale = $state<GridScale>(isMobileDevice() ? 'small' : 'medium');
+// Default to 'medium' on all devices
+let gridScale = $state<GridScale>('medium');
 let gridWidth = $state(256);
 let gridHeight = $state(256);
 
 // Visual settings
 let isLightTheme = $state(false);
-let aliveColor = $state<[number, number, number]>([0.85, 0.8, 0.7]); // Sand default
+let aliveColor = $state<[number, number, number]>([1.0, 0.95, 0.8]); // Cream default
 
 // Spectrum modes for multi-state color transitions
 export type SpectrumMode = 'hueShift' | 'rainbow' | 'warm' | 'cool' | 'monochrome' | 'fire';
@@ -76,7 +76,7 @@ export const BOUNDARY_MODES: { id: BoundaryMode; name: string; description: stri
 	{ id: 'mobiusY', name: 'Y-Möbius', description: 'Vertical wrap with flip' },
 	{ id: 'kleinX', name: 'X-Klein', description: 'Klein bottle (X-oriented)' },
 	{ id: 'kleinY', name: 'Y-Klein', description: 'Klein bottle (Y-oriented)' },
-	{ id: 'projectivePlane', name: 'Projective', description: 'Both edges flip' }
+	{ id: 'projectivePlane', name: 'Projective Plane', description: 'Both edges flip' }
 ];
 
 // Convert boundary mode to shader index
@@ -93,7 +93,7 @@ let spectrumMode = $state<SpectrumMode>('fire');
 // Neighbor shading mode - modulate color based on neighbors
 // 'off' = no shading, 'alive' = count alive neighbors, 'vitality' = sum neighbor states
 export type NeighborShadingMode = 'off' | 'alive' | 'vitality';
-let neighborShading = $state<NeighborShadingMode>('alive');
+let neighborShading = $state<NeighborShadingMode>('vitality');
 
 // Color palettes for dark and light themes
 export const DARK_THEME_COLORS: { name: string; color: [number, number, number]; hex: string }[] = [
@@ -437,7 +437,7 @@ let seedPattern = $state<SeedPatternId>('pixel'); // Current seed pattern
 let seedAlive = $state(true); // true = add alive cells, false = add dead cells (erase)
 
 // Boundary mode - topological boundary condition
-let boundaryMode = $state<BoundaryMode>('torus'); // Default to torus (classic Game of Life behavior)
+let boundaryMode = $state<BoundaryMode>('projectivePlane'); // Default to projective plane
 
 // Stats
 let aliveCells = $state(0);
