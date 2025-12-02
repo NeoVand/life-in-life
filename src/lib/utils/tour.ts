@@ -315,10 +315,9 @@ const icons = {
 	step: `<svg viewBox="0 0 24 24" fill="currentColor" class="tour-icon">
 		<path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2V6z"/>
 	</svg>`,
-	// Clock/speed icon
-	clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tour-icon">
-		<circle cx="12" cy="12" r="10"/>
-		<path d="M12 6v6l4 2"/>
+	// Lightning/speed icon
+	lightning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tour-icon">
+		<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
 	</svg>`,
 	// Brush icon
 	brush: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="tour-icon">
@@ -428,7 +427,7 @@ function getTourSteps(): DriveStep[] {
 				align: 'center'
 			}
 		},
-		// 2. Canvas interaction
+		// 2. Canvas interaction - no rounded corners for full canvas highlight
 		{
 			element: 'canvas',
 			popover: {
@@ -438,6 +437,13 @@ function getTourSteps(): DriveStep[] {
 					: 'This is where cells live and evolve. Click to draw, right-click to erase, scroll to zoom, and Shift+drag to pan.',
 				side: 'over',
 				align: 'center'
+			},
+			// Override stageRadius for canvas to have sharp corners
+			onHighlightStarted: (element, step, { driver }) => {
+				driver.setConfig({ ...driver.getConfig(), stageRadius: 0 });
+			},
+			onDeselected: (element, step, { driver }) => {
+				driver.setConfig({ ...driver.getConfig(), stageRadius: 9999 });
 			}
 		},
 		// 3. Playback group
@@ -448,7 +454,7 @@ function getTourSteps(): DriveStep[] {
 				description: createGroupDescription([
 					{ icon: icons.play, label: 'Play/Pause', shortcut: 'Space' },
 					{ icon: icons.step, label: 'Step forward', shortcut: 'S' },
-					{ icon: icons.clock, label: 'Adjust speed', shortcut: '< >' }
+					{ icon: icons.lightning, label: 'Adjust speed', shortcut: '< >' }
 				], 'Control the simulation timing.', mobile),
 				side: popoverSide,
 				align: 'center'
@@ -611,33 +617,35 @@ export function getTourStyles(accentColor: string, isLightTheme: boolean): strin
 		
 		.driver-popover.gol-tour-popover .driver-popover-prev-btn,
 		.driver-popover.gol-tour-popover .driver-popover-next-btn {
-			background: ${accentColor} !important;
-			color: ${isLightTheme ? '#fff' : '#0a0a0f'} !important;
-			border: none !important;
+			background: transparent !important;
+			color: ${mutedColor} !important;
+			border: 1px solid ${borderColor} !important;
 			border-radius: 6px !important;
 			padding: 0.5rem 1rem !important;
 			font-size: 0.8rem !important;
 			font-weight: 500 !important;
 			cursor: pointer !important;
-			transition: filter 0.15s !important;
+			transition: all 0.15s !important;
 			box-shadow: none !important;
 			text-shadow: none !important;
 		}
 		
 		.driver-popover.gol-tour-popover .driver-popover-prev-btn:hover,
 		.driver-popover.gol-tour-popover .driver-popover-next-btn:hover {
-			filter: brightness(1.1) !important;
+			color: ${textColor} !important;
+			border-color: ${accentColor} !important;
 			box-shadow: none !important;
 		}
 		
-		.driver-popover.gol-tour-popover .driver-popover-prev-btn {
-			background: transparent !important;
-			color: ${mutedColor} !important;
-			border: 1px solid ${borderColor} !important;
+		/* Next/Done button - outlined accent style */
+		.driver-popover.gol-tour-popover .driver-popover-next-btn {
+			background: ${isLightTheme ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.03)'} !important;
+			color: ${accentColor} !important;
+			border: 1px solid ${accentColor}40 !important;
 		}
 		
-		.driver-popover.gol-tour-popover .driver-popover-prev-btn:hover {
-			color: ${textColor} !important;
+		.driver-popover.gol-tour-popover .driver-popover-next-btn:hover {
+			background: ${accentColor}15 !important;
 			border-color: ${accentColor} !important;
 		}
 		

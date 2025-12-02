@@ -102,9 +102,8 @@
 				class:active={showSpeedSlider}
 				aria-label="Speed"
 			>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<circle cx="12" cy="12" r="10" />
-					<path d="M12 6v6l4 2" />
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
 				</svg>
 			</button>
 			{#if showSpeedSlider}
@@ -304,12 +303,13 @@
 		background: var(--group-bg, rgba(255, 255, 255, 0.04));
 		padding: 0.2rem 0.35rem;
 		border-radius: 9999px;
-		border: none;
-		transition: background 0.15s;
+		border: 1px solid var(--group-border, rgba(255, 255, 255, 0.06));
+		transition: background 0.15s, border-color 0.15s;
 	}
 
 	.button-group:hover {
 		background: var(--group-bg-hover, rgba(255, 255, 255, 0.06));
+		border-color: var(--group-border-hover, rgba(255, 255, 255, 0.1));
 	}
 
 	/* Hide all button groups except collapse-group when collapsed */
@@ -319,13 +319,14 @@
 		max-height: 0;
 		padding: 0;
 		margin: 0;
+		border-width: 0;
 		overflow: hidden;
 		pointer-events: none;
 	}
 
 	/* Animate button groups appearing/disappearing */
 	.button-group {
-		transition: opacity 0.2s ease, max-width 0.2s ease, max-height 0.2s ease, padding 0.2s ease, margin 0.2s ease, background 0.15s;
+		transition: opacity 0.2s ease, max-width 0.2s ease, max-height 0.2s ease, padding 0.2s ease, margin 0.2s ease, border-width 0.2s ease, background 0.15s, border-color 0.15s;
 		max-width: 200px;
 		max-height: 50px;
 	}
@@ -393,6 +394,7 @@
 	/* Collapse group - same as button-group but invisible and square */
 	.button-group.collapse-group {
 		background: transparent;
+		border: none;
 		/* Make it square */
 		padding: 0.25rem;
 		width: 36px;
@@ -403,6 +405,7 @@
 
 	.button-group.collapse-group:hover {
 		background: transparent;
+		border: none;
 	}
 
 	/* Larger icon for collapse button */
