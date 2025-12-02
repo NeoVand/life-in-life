@@ -27,7 +27,7 @@
 <style>
 	.click-hint {
 		position: fixed;
-		top: 50%;
+		top: calc(50% - 30px);
 		left: 50%;
 		transform: translate(-50%, -100%);
 		display: flex;
