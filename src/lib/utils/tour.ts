@@ -3,6 +3,13 @@ import { driver, type DriveStep, type Config } from 'driver.js';
 // Tour state management
 const TOUR_COMPLETED_KEY = 'games-of-life-tour-completed';
 
+// Track if tour is currently active
+let tourActive = false;
+
+export function isTourActive(): boolean {
+	return tourActive;
+}
+
 // Mini simulation state for welcome preview
 let miniSimInterval: number | null = null;
 let miniSimCanvas: HTMLCanvasElement | null = null;
@@ -548,12 +555,14 @@ export function createTour(options?: {
 			}
 		},
 		onDestroyed: () => {
+			tourActive = false;
 			stopMiniSim();
 			markTourCompleted();
 			options?.onComplete?.();
 		},
 		onCloseClick: () => {
 			// Close the tour when X is clicked
+			tourActive = false;
 			stopMiniSim();
 			markTourCompleted();
 			options?.onSkip?.();
@@ -567,6 +576,7 @@ export function createTour(options?: {
 
 // Start the tour
 export function startTour(options?: Parameters<typeof createTour>[0]): void {
+	tourActive = true;
 	const driverObj = createTour(options);
 	driverObj.drive();
 }

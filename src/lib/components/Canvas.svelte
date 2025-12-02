@@ -3,6 +3,7 @@
 	import { initWebGPU, type WebGPUContext, type WebGPUError } from '../webgpu/context.js';
 	import { Simulation } from '../webgpu/simulation.js';
 	import { getSimulationState, GRID_SCALES, type GridScale, type SpectrumMode } from '../stores/simulation.svelte.js';
+	import { isTourActive } from '../utils/tour.js';
 
 	const simState = getSimulationState();
 	
@@ -314,6 +315,9 @@
 	function handleMouseDown(e: MouseEvent) {
 		if (!simulation) return;
 		
+		// Disable drawing during tour
+		if (isTourActive()) return;
+		
 		// Mark that user has interacted (dismiss click hint)
 		simState.hasInteracted = true;
 
@@ -433,6 +437,13 @@
 
 	function handleTouchStart(e: TouchEvent) {
 		if (!simulation) return;
+		
+		// Disable drawing during tour
+		if (isTourActive()) {
+			e.preventDefault();
+			return;
+		}
+		
 		e.preventDefault();
 		
 		// Mark that user has interacted (dismiss click hint)
