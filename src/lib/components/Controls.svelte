@@ -207,14 +207,6 @@
 
 	<!-- GROUP 3: Camera Controls -->
 	<div class="button-group" id="tour-camera-group">
-		<!-- Screenshot -->
-		<button id="tour-screenshot-btn" class="control-btn" onclick={onscreenshot} data-tooltip="Screenshot">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" />
-				<circle cx="12" cy="13" r="4" />
-			</svg>
-		</button>
-
 		<!-- Reset View / Zoom to Fit -->
 		<button id="tour-fit-btn" class="control-btn" onclick={onresetview} data-tooltip="Fit to Screen (F)">
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -228,6 +220,14 @@
 				<path d="M15 9l5-5m0 0v3m0-3h-3" />
 				<path d="M9 15l-5 5m0 0v-3m0 3h3" />
 				<path d="M15 15l5 5m0 0v-3m0 3h-3" />
+			</svg>
+		</button>
+
+		<!-- Screenshot -->
+		<button id="tour-screenshot-btn" class="control-btn" onclick={onscreenshot} data-tooltip="Screenshot">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" />
+				<circle cx="12" cy="13" r="4" />
 			</svg>
 		</button>
 	</div>

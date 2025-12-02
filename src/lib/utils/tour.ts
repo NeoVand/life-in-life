@@ -475,8 +475,8 @@ function getTourSteps(): DriveStep[] {
 			popover: {
 				title: titleWithIcon(icons.camera, 'View Controls'),
 				description: createGroupDescription([
-					{ icon: icons.camera, label: 'Take screenshot' },
-					{ icon: icons.fit, label: 'Fit to screen', shortcut: 'F' }
+					{ icon: icons.fit, label: 'Fit to screen', shortcut: 'F' },
+					{ icon: icons.camera, label: 'Take screenshot' }
 				], 'Capture and navigate the view.', mobile),
 				side: popoverSide,
 				align: 'center'

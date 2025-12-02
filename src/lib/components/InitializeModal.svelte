@@ -238,6 +238,7 @@
 	function initPreviewGrid() {
 		const sizeX = PREVIEW_SIZE_X;
 		const sizeY = previewSizeY;
+		const numStates = simState.currentRule.numStates;
 		previewGrid = new Array(sizeX * sizeY).fill(0);
 		
 		if (selectedPattern.startsWith('random')) {
@@ -257,7 +258,23 @@
 			};
 
 			for (let i = 0; i < previewGrid.length; i++) {
-				previewGrid[i] = seededRandom() < density ? 1 : 0;
+				if (seededRandom() < density) {
+					if (numStates > 2) {
+						// For multi-state rules, distribute across spectrum
+						const rand = seededRandom();
+						if (rand < 0.5) {
+							// 50% chance of being fully alive
+							previewGrid[i] = 1;
+						} else {
+							// 50% chance of being in a dying state
+							const dyingStates = numStates - 2;
+							const weightedRand = Math.pow(seededRandom(), 1.5);
+							previewGrid[i] = 2 + Math.floor(weightedRand * dyingStates);
+						}
+					} else {
+						previewGrid[i] = 1;
+					}
+				}
 			}
 		} else {
 			const cells = PATTERN_CELLS[selectedPattern];
@@ -1233,8 +1250,9 @@
 	}
 
 	.pattern-btn.selected {
-		background: var(--ui-accent-bg, rgba(45, 212, 191, 0.15));
-		border-color: var(--ui-accent-border, rgba(45, 212, 191, 0.4));
+		background: var(--ui-accent-bg, rgba(45, 212, 191, 0.2));
+		border-color: var(--ui-accent, rgba(45, 212, 191, 0.6));
+		box-shadow: 0 0 0 1px var(--ui-accent-border, rgba(45, 212, 191, 0.3));
 	}
 
 	.pattern-name {
@@ -1255,13 +1273,14 @@
 		color: var(--ui-text, #aaa);
 	}
 
-	.pattern-btn.optimal {
-		background: var(--ui-accent-bg, rgba(45, 212, 191, 0.1));
-		border-color: var(--ui-accent-border, rgba(45, 212, 191, 0.25));
+	/* Optimal has subtle highlight when NOT selected */
+	.pattern-btn.optimal:not(.selected) {
+		border-color: var(--ui-accent-border, rgba(45, 212, 191, 0.15));
 	}
 
-	.pattern-btn.optimal .pattern-name {
+	.pattern-btn.optimal:not(.selected) .pattern-name {
 		color: var(--ui-accent, #2dd4bf);
+		opacity: 0.8;
 	}
 
 	.origin-badge {

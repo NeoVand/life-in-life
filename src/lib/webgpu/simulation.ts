@@ -467,16 +467,42 @@ export class Simulation {
 
 	/**
 	 * Randomize the grid
+	 * @param density - Probability of a cell being non-dead (0-1)
+	 * @param includeSpectrum - If true and numStates > 2, include dying states in the random distribution
 	 */
-	randomize(density = 0.25): void {
+	randomize(density = 0.25, includeSpectrum = true): void {
 		const cellCount = this.width * this.height;
 		const data = new Uint32Array(cellCount);
 		let alive = 0;
+		const numStates = this.rule.numStates;
 
 		for (let i = 0; i < cellCount; i++) {
-			const isAlive = Math.random() < density ? 1 : 0;
-			data[i] = isAlive;
-			if (isAlive) alive++;
+			if (Math.random() < density) {
+				if (includeSpectrum && numStates > 2) {
+					// For multi-state rules, distribute across all states
+					// Higher probability for alive (1) and early dying states
+					// State 1 = alive, States 2 to numStates-1 = dying
+					const rand = Math.random();
+					if (rand < 0.5) {
+						// 50% chance of being fully alive
+						data[i] = 1;
+						alive++;
+					} else {
+						// 50% chance of being in a dying state (2 to numStates-1)
+						// Weighted towards earlier dying states (more colorful)
+						const dyingStates = numStates - 2; // Number of dying states
+						const weightedRand = Math.pow(Math.random(), 1.5); // Bias towards lower values
+						const dyingState = 2 + Math.floor(weightedRand * dyingStates);
+						data[i] = Math.min(dyingState, numStates - 1);
+					}
+				} else {
+					// Simple alive/dead for 2-state rules
+					data[i] = 1;
+					alive++;
+				}
+			} else {
+				data[i] = 0;
+			}
 		}
 
 		this._aliveCells = alive;
