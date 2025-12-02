@@ -401,7 +401,7 @@ export const SEED_PATTERNS_HEX: SeedPattern[] = [
 ];
 
 // Continuous seeding settings
-let seedingEnabled = $state(true); // Whether continuous seeding is active
+let seedingEnabled = $state(false); // Whether continuous seeding is active
 let seedingRate = $state(0.1); // Seeds per 1000 cells per frame (0.01 - 1.0)
 let seedPattern = $state<SeedPatternId>('pixel'); // Current seed pattern
 let seedAlive = $state(true); // true = add alive cells, false = add dead cells (erase)
