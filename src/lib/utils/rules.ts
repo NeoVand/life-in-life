@@ -841,6 +841,62 @@ export const RULE_PRESETS: CARule[] = [
 		description: 'Coral-like growth patterns in extended hex grid',
 		density: 0.2
 	},
+	// Extended Moore (24-neighbor) artistic rules - inspired by Hex2 Neo patterns
+	{
+		name: 'Ext24 Neo Brain',
+		birthMask: 0b111010000, // 4, 6, 7, 8
+		surviveMask: 0b11111000000, // 6, 7, 8, 9, 10
+		numStates: 128,
+		ruleString: 'B4,6,7,8/S6,7,8,9,10/C128',
+		neighborhood: 'extendedMoore',
+		category: 'artistic',
+		description: 'Neural patterns with smooth trails on 24-neighbor grid',
+		density: 0.15
+	},
+	{
+		name: 'Ext24 Neo Slime',
+		birthMask: 0b1111111111111111110000000, // 7-24
+		surviveMask: 0b1111111111000011111000000, // 7-11, 15-24 (gap at 12-14)
+		numStates: 128,
+		ruleString: 'B7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24/S7,8,9,10,11,15,16,17,18,19,20,21,22,23,24/C128',
+		neighborhood: 'extendedMoore',
+		category: 'artistic',
+		description: 'Organic slime-like spreading with gapped survival',
+		density: 0.2
+	},
+	{
+		name: 'Ext24 Neo Undead',
+		birthMask: 0b1111111111111111110010000, // 4, 7-24
+		surviveMask: 0b1111111111100011111000000, // 7-11, 14-24 (gap at 12-13)
+		numStates: 256,
+		ruleString: 'B4,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24/S7,8,9,10,11,14,15,16,17,18,19,20,21,22,23,24/C256',
+		neighborhood: 'extendedMoore',
+		category: 'artistic',
+		description: 'Long-lived undying patterns with maximum state trails',
+		density: 0.18
+	},
+	{
+		name: 'Ext24 Neo Coral',
+		birthMask: 0b1111100000, // 5, 6, 7, 8, 9
+		surviveMask: 0b1111111000000, // 6, 7, 8, 9, 10, 11, 12
+		numStates: 96,
+		ruleString: 'B5,6,7,8,9/S6,7,8,9,10,11,12/C96',
+		neighborhood: 'extendedMoore',
+		category: 'artistic',
+		description: 'Coral reef-like organic growth patterns',
+		density: 0.15
+	},
+	{
+		name: 'Ext24 Neo Waves',
+		birthMask: 0b1111111111111111100100000, // 5, 8-24
+		surviveMask: 0b1111111110000001111100000, // 8-12, 16-24 (gap at 13-15)
+		numStates: 64,
+		ruleString: 'B5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24/S8,9,10,11,12,16,17,18,19,20,21,22,23,24/C64',
+		neighborhood: 'extendedMoore',
+		category: 'artistic',
+		description: 'Wave-like interference patterns with medium trails',
+		density: 0.2
+	},
 	{
 		name: 'Hex2 Neo Brain 2',
 		birthMask: 0b0001101000, // 3, 5, 6
