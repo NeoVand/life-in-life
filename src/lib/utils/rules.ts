@@ -928,6 +928,28 @@ export const RULE_PRESETS: CARule[] = [
 		category: 'artistic',
 		description: 'Fungal growth patterns with balanced birth and survival',
 		density: 0.2
+	},
+	{
+		name: 'Hex2 Neo Twisting Waves',
+		birthMask: 0b1111111111111101000, // 3, 5-18
+		surviveMask: 0b1111111100111100000, // 5-8, 11-18
+		numStates: 35,
+		ruleString: 'B3,5,6,7,8,9,10,11,12,13,14,15,16,17,18/S5,6,7,8,11,12,13,14,15,16,17,18/C35',
+		neighborhood: 'extendedHexagonal',
+		category: 'artistic',
+		description: 'Twisting wave patterns with medium-length trails',
+		density: 0.2
+	},
+	{
+		name: 'Hex2 Neo Slime Mold',
+		birthMask: 0b1111111111111100000, // 5-18
+		surviveMask: 0b1111111100111100000, // 5-8, 11-18
+		numStates: 64,
+		ruleString: 'B5,6,7,8,9,10,11,12,13,14,15,16,17,18/S5,6,7,8,11,12,13,14,15,16,17,18/C64',
+		neighborhood: 'extendedHexagonal',
+		category: 'artistic',
+		description: 'Organic slime mold-like spreading patterns',
+		density: 0.2
 	}
 ];
 

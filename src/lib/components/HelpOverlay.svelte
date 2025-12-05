@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { draggable } from '../utils/draggable.js';
+	import { bringToFront, setModalPosition, getModalState } from '../stores/modalManager.svelte.js';
+
 	interface Props {
 		onclose: () => void;
 		onstarttour: () => void;
@@ -9,11 +12,16 @@
 	// Detect if we're on a touch device
 	const isMobile = typeof window !== 'undefined' && 
 		('ontouchstart' in window || navigator.maxTouchPoints > 0);
-
-	function handleBackdropClick(e: MouseEvent) {
-		if (e.target === e.currentTarget) {
-			onclose();
-		}
+	
+	// Modal dragging state
+	const modalState = $derived(getModalState('help'));
+	
+	function handleDragEnd(position: { x: number; y: number }) {
+		setModalPosition('help', position);
+	}
+	
+	function handleModalClick() {
+		bringToFront('help');
 	}
 
 	function handleStartTour() {
@@ -26,8 +34,18 @@
 <svelte:window onkeydown={(e) => e.key === 'Escape' && onclose()} />
 
 <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
-<div class="help-overlay" role="dialog" aria-modal="true" tabindex="-1" onclick={handleBackdropClick}>
-	<div class="help-panel">
+<div class="help-overlay" role="dialog" aria-modal="true" tabindex="-1">
+	<div 
+		class="help-panel"
+		style="z-index: {modalState.zIndex};"
+		onclick={handleModalClick}
+		use:draggable={{ 
+			handle: '.help-header', 
+			bounds: true,
+			initialPosition: modalState.position,
+			onDragEnd: handleDragEnd
+		}}
+	>
 		<div class="help-header">
 			<h2>
 				<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -194,6 +212,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 500;
+		pointer-events: none; /* Allow clicks to pass through to canvas */
 	}
 
 	.help-panel {
@@ -203,6 +222,14 @@
 		border-radius: 10px;
 		width: 380px;
 		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+		/* Draggable support */
+		pointer-events: auto;
+		position: relative;
+		will-change: transform;
+	}
+
+	.help-panel:global(.dragging) {
+		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
 	}
 
 	.help-header {

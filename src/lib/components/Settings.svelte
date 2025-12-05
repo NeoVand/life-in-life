@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { getSimulationState, DARK_THEME_COLORS, LIGHT_THEME_COLORS, SPECTRUM_MODES, type SpectrumMode } from '../stores/simulation.svelte.js';
+	import { draggable } from '../utils/draggable.js';
+	import { bringToFront, setModalPosition, getModalState } from '../stores/modalManager.svelte.js';
 
 	interface Props {
 		onclose: () => void;
@@ -8,6 +10,17 @@
 	let { onclose }: Props = $props();
 
 	const simState = getSimulationState();
+	
+	// Modal dragging state
+	const modalState = $derived(getModalState('settings'));
+	
+	function handleDragEnd(position: { x: number; y: number }) {
+		setModalPosition('settings', position);
+	}
+	
+	function handleModalClick() {
+		bringToFront('settings');
+	}
 
 	const colorPalettes = $derived(simState.isLightTheme ? LIGHT_THEME_COLORS : DARK_THEME_COLORS);
 
@@ -256,7 +269,7 @@
 <svelte:window onkeydown={(e) => e.key === 'Escape' && onclose()} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
-<div class="backdrop" onclick={(e) => e.target === e.currentTarget && onclose()} onwheel={(e) => {
+<div class="backdrop" onwheel={(e) => {
 	// Only forward wheel events if scrolling on the backdrop itself (not inside modal content)
 	if (e.target !== e.currentTarget) return;
 	
@@ -273,7 +286,17 @@
 	}
 }}>
 	<!-- Theme Panel -->
-		<div class="panel">
+		<div 
+			class="panel"
+			style="z-index: {modalState.zIndex};"
+			onclick={handleModalClick}
+			use:draggable={{ 
+				handle: '.header', 
+				bounds: true,
+				initialPosition: modalState.position,
+				onDragEnd: handleDragEnd
+			}}
+		>
 			<div class="header">
 				<span class="title">
 					<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -428,6 +451,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 1000;
+		pointer-events: none; /* Allow clicks to pass through to canvas */
 	}
 
 	.panel {
@@ -438,6 +462,14 @@
 		padding: 0.6rem;
 		min-width: 240px;
 		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+		/* Draggable support */
+		pointer-events: auto;
+		position: relative;
+		will-change: transform;
+	}
+
+	.panel:global(.dragging) {
+		box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
 	}
 
 	.header {

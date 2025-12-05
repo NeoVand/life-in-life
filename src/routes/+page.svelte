@@ -10,15 +10,23 @@
 	import ClickHint from '$lib/components/ClickHint.svelte';
 	import AboutModal from '$lib/components/AboutModal.svelte';
 	import { getSimulationState, getUIState, DARK_THEME_COLORS, LIGHT_THEME_COLORS, SPECTRUM_MODES, type GridScale } from '$lib/stores/simulation.svelte.js';
+	import { 
+		openModal, closeModal, toggleModal, isModalOpen, getModalStates,
+		type ModalId
+	} from '$lib/stores/modalManager.svelte.js';
 	import { hasTourBeenCompleted, startTour, getTourStyles } from '$lib/utils/tour.js';
 	import 'driver.js/dist/driver.css';
 
 	const simState = getSimulationState();
 	const uiState = getUIState();
 	
-	let showHelp = $state(false);
-	let showInitialize = $state(false);
-	let showAbout = $state(false);
+	// Use modal manager for multi-modal support
+	const modalStates = $derived(getModalStates());
+	const showHelp = $derived(modalStates.help.isOpen);
+	const showInitialize = $derived(modalStates.initialize.isOpen);
+	const showAbout = $derived(modalStates.about.isOpen);
+	const showRuleEditor = $derived(modalStates.ruleEditor.isOpen);
+	const showSettings = $derived(modalStates.settings.isOpen);
 	let canvas: Canvas;
 	let tourStyleElement: HTMLStyleElement | null = null;
 
@@ -290,26 +298,29 @@
 				simState.showGrid = !simState.showGrid;
 				break;
 			case 'KeyE':
-				uiState.showRuleEditor = !uiState.showRuleEditor;
+				toggleModal('ruleEditor');
 				break;
 			case 'KeyI':
 				// Toggle initialize modal
-				showInitialize = !showInitialize;
+				toggleModal('initialize');
 				break;
 			case 'KeyF':
 			case 'Home':
 				handleResetView();
 				break;
 			case 'Escape':
-				showHelp = false;
-				showInitialize = false;
-				showAbout = false;
+				// Close all modals
+				closeModal('help');
+				closeModal('initialize');
+				closeModal('about');
+				closeModal('ruleEditor');
+				closeModal('settings');
 				uiState.closeAll();
 				break;
 			case 'Slash':
 				if (e.shiftKey) {
 					e.preventDefault();
-					showHelp = !showHelp;
+					toggleModal('help');
 				}
 				break;
 			case 'BracketLeft':
@@ -348,45 +359,45 @@
 
 	<Controls
 		onclear={handleClear}
-		oninitialize={() => (showInitialize = true)}
+		oninitialize={() => toggleModal('initialize')}
 		onstep={handleStep}
 		onresetview={handleResetView}
 		onscreenshot={handleScreenshot}
-		onhelp={() => (showHelp = !showHelp)}
-		onabout={() => (showAbout = !showAbout)}
+		onhelp={() => toggleModal('help')}
+		onabout={() => toggleModal('about')}
 		{showHelp}
 		{showInitialize}
 		{showAbout}
 	/>
 
 	{#if showHelp}
-		<HelpOverlay onclose={() => (showHelp = false)} onstarttour={handleStartTour} />
+		<HelpOverlay onclose={() => closeModal('help')} onstarttour={handleStartTour} />
 	{/if}
 
 	{#if showInitialize}
 		<InitializeModal
-			onclose={() => (showInitialize = false)}
+			onclose={() => closeModal('initialize')}
 			oninitialize={handleInitialize}
 			onscalechange={handleScaleChange}
 		/>
 	{/if}
 
-	{#if uiState.showRuleEditor}
+	{#if showRuleEditor}
 		<RuleEditor
-			onclose={() => (uiState.showRuleEditor = false)}
+			onclose={() => closeModal('ruleEditor')}
 			onrulechange={handleRuleChange}
 			onreinitialize={() => canvas?.reinitialize()}
 		/>
 	{/if}
 
-	{#if uiState.showSettings}
+	{#if showSettings}
 		<Settings
-			onclose={() => (uiState.showSettings = false)}
+			onclose={() => closeModal('settings')}
 		/>
 	{/if}
 
 	{#if showAbout}
-		<AboutModal onclose={() => (showAbout = false)} onstarttour={handleStartTour} />
+		<AboutModal onclose={() => closeModal('about')} onstarttour={handleStartTour} />
 	{/if}
 </main>
 

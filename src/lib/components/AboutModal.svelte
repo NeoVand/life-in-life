@@ -1,5 +1,7 @@
 <script lang="ts">
 	import HeartIcon from './HeartIcon.svelte';
+	import { draggable } from '../utils/draggable.js';
+	import { bringToFront, setModalPosition, getModalState } from '../stores/modalManager.svelte.js';
 
 	interface Props {
 		onclose: () => void;
@@ -7,6 +9,17 @@
 	}
 
 	let { onclose, onstarttour }: Props = $props();
+	
+	// Modal dragging state
+	const modalState = $derived(getModalState('about'));
+	
+	function handleDragEnd(position: { x: number; y: number }) {
+		setModalPosition('about', position);
+	}
+	
+	function handleModalClick() {
+		bringToFront('about');
+	}
 
 	function handleStartTour() {
 		onclose();
@@ -19,7 +32,7 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
-<div class="modal-backdrop" onclick={(e) => e.target === e.currentTarget && onclose()} onwheel={(e) => {
+<div class="modal-backdrop" onwheel={(e) => {
 	// Only forward wheel events if scrolling on the backdrop itself (not inside modal content)
 	if (e.target !== e.currentTarget) return;
 	
@@ -35,7 +48,17 @@
 		}));
 	}
 }}>
-	<div class="modal">
+	<div 
+		class="modal"
+		style="z-index: {modalState.zIndex};"
+		onclick={handleModalClick}
+		use:draggable={{ 
+			handle: '.header', 
+			bounds: true,
+			initialPosition: modalState.position,
+			onDragEnd: handleDragEnd
+		}}
+	>
 		<div class="header">
 			<HeartIcon size={24} animated={true} />
 			<span class="title">Games of Life</span>
@@ -154,6 +177,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 1000;
+		pointer-events: none; /* Allow clicks to pass through to canvas */
 	}
 
 	.modal {
@@ -164,6 +188,14 @@
 		padding: 1.2rem;
 		max-width: 580px;
 		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+		/* Draggable support */
+		pointer-events: auto;
+		position: relative;
+		will-change: transform;
+	}
+
+	.modal:global(.dragging) {
+		box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
 	}
 
 	.header {

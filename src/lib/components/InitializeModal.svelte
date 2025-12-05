@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { getSimulationState, SEED_PATTERNS, SEED_PATTERNS_HEX, GRID_SCALES, type SeedPatternId, type GridScale } from '../stores/simulation.svelte.js';
+	import { draggable } from '../utils/draggable.js';
+	import { bringToFront, setModalPosition, getModalState } from '../stores/modalManager.svelte.js';
 	import { onMount, onDestroy } from 'svelte';
 
 	interface Props {
@@ -11,6 +13,17 @@
 	let { onclose, oninitialize, onscalechange }: Props = $props();
 
 	const simState = getSimulationState();
+	
+	// Modal dragging state
+	const modalState = $derived(getModalState('initialize'));
+	
+	function handleDragEnd(position: { x: number; y: number }) {
+		setModalPosition('initialize', position);
+	}
+	
+	function handleModalClick() {
+		bringToFront('initialize');
+	}
 	
 	// Grid scale
 	const currentDimensions = $derived(`${simState.gridWidth}×${simState.gridHeight}`);
@@ -759,7 +772,7 @@
 <svelte:window onkeydown={(e) => e.key === 'Escape' && onclose()} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
-<div class="modal-backdrop" onclick={(e) => e.target === e.currentTarget && onclose()} onwheel={(e) => {
+<div class="modal-backdrop" onwheel={(e) => {
 	// Only forward wheel events if scrolling on the backdrop itself (not inside modal content)
 	if (e.target !== e.currentTarget) return;
 	
@@ -775,7 +788,17 @@
 		}));
 	}
 }}>
-	<div class="modal">
+	<div 
+		class="modal"
+		style="z-index: {modalState.zIndex};"
+		onclick={handleModalClick}
+		use:draggable={{ 
+			handle: '.header', 
+			bounds: true,
+			initialPosition: modalState.position,
+			onDragEnd: handleDragEnd
+		}}
+	>
 		<div class="header">
 			<span class="title">
 				<svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1093,6 +1116,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 1000;
+		pointer-events: none; /* Allow clicks to pass through to canvas */
 	}
 
 	.modal {
@@ -1106,6 +1130,14 @@
 		gap: 0.8rem;
 		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
 		min-width: 480px;
+		/* Draggable support */
+		pointer-events: auto;
+		position: relative;
+		will-change: transform;
+	}
+
+	.modal:global(.dragging) {
+		box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
 	}
 
 	.header {

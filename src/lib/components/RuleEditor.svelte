@@ -15,6 +15,8 @@
 		type RuleCategory,
 		type NeighborhoodType 
 	} from '../utils/rules.js';
+	import { draggable } from '../utils/draggable.js';
+	import { bringToFront, setModalPosition, getModalState } from '../stores/modalManager.svelte.js';
 	import BoundaryIcon from './BoundaryIcon.svelte';
 	import { onMount, onDestroy } from 'svelte';
 
@@ -27,6 +29,17 @@
 	let { onclose, onrulechange, onreinitialize }: Props = $props();
 
 	const simState = getSimulationState();
+	
+	// Modal dragging state
+	const modalState = $derived(getModalState('ruleEditor'));
+	
+	function handleDragEnd(position: { x: number; y: number }) {
+		setModalPosition('ruleEditor', position);
+	}
+	
+	function handleModalClick() {
+		bringToFront('ruleEditor');
+	}
 	
 	// Store the original rule when editor opens, for reverting on cancel
 	const originalRule: CARule = { ...simState.currentRule };
@@ -919,7 +932,17 @@
 		}));
 	}
 }}>
-	<div class="editor">
+	<div 
+		class="editor" 
+		style="z-index: {modalState.zIndex};"
+		onclick={handleModalClick}
+		use:draggable={{ 
+			handle: '.header', 
+			bounds: true,
+			initialPosition: modalState.position,
+			onDragEnd: handleDragEnd
+		}}
+	>
 		<!-- Row 1: Title + Apply + Close -->
 		<div class="header">
 			<span class="title">
@@ -1258,6 +1281,13 @@
 		gap: 0.6rem;
 		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
 		max-width: 520px;
+		/* Draggable support */
+		position: relative;
+		will-change: transform;
+	}
+
+	.editor:global(.dragging) {
+		box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
 	}
 
 	/* Header */

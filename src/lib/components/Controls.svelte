@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getSimulationState, getUIState, BRUSH_TYPES } from '../stores/simulation.svelte.js';
+	import { openModal, getModalStates } from '../stores/modalManager.svelte.js';
 	import HeartIcon from './HeartIcon.svelte';
 
 	interface Props {
@@ -19,6 +20,7 @@
 
 	const simState = getSimulationState();
 	const uiState = getUIState();
+	const modalStates = $derived(getModalStates());
 
 	let collapsed = $state(false);
 	let showSpeedSlider = $state(false);
@@ -46,12 +48,12 @@
 
 	function openRules() {
 		closeAllPopups();
-		uiState.showRuleEditor = true;
+		openModal('ruleEditor');
 	}
 
 	function openSettings() {
 		closeAllPopups();
-		uiState.showSettings = true;
+		openModal('settings');
 	}
 
 	function openInitialize() {
@@ -126,7 +128,7 @@
 	<!-- GROUP 2: Editing Controls -->
 	<div class="button-group" id="tour-editing-group">
 		<!-- Rules - Calligraphic f (function) -->
-		<button id="tour-rules-btn" class="control-btn" class:active={uiState.showRuleEditor} onclick={openRules} data-tooltip="Edit Rules (E)">
+		<button id="tour-rules-btn" class="control-btn" class:active={modalStates.ruleEditor.isOpen} onclick={openRules} data-tooltip="Edit Rules (E)">
 			<svg viewBox="0 0 24 24" fill="currentColor">
 				<!-- Bold italic f -->
 				<path d="M16.5 3C14 3 12.5 4.5 11.8 7L10.5 11H7.5C7 11 6.5 11.4 6.5 12s.5 1 1 1h2.3l-1.6 5.5C7.7 20 6.8 21 5.5 21c-.5 0-.9-.1-1.2-.3-.4-.2-.9-.1-1.1.3-.2.4-.1.9.3 1.1.6.3 1.3.5 2 .5 2.5 0 4-1.5 4.8-4.2L12 13h3.5c.5 0 1-.4 1-1s-.5-1-1-1h-2.8l1.1-3.5C14.3 5.8 15.2 5 16.5 5c.4 0 .8.1 1.1.2.4.2.9 0 1.1-.4.2-.4 0-.9-.4-1.1-.6-.4-1.4-.7-2.3-.7z" />
@@ -280,7 +282,7 @@
 		</button>
 
 		<!-- Theme -->
-		<button id="tour-theme-btn" class="control-btn" class:active={uiState.showSettings} onclick={openSettings} data-tooltip="Theme">
+		<button id="tour-theme-btn" class="control-btn" class:active={modalStates.settings.isOpen} onclick={openSettings} data-tooltip="Theme">
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 				<!-- Droplet icon - simple and clean -->
 				<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
